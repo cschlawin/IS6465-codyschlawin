@@ -44,7 +44,14 @@ echo $tutor->profileSummary();
 
 
 
-
+$gpa = 3.8;
+if ($gpa >= 3.9) {
+    echo "Full scholarship";
+} elseif ($gpa >= 3.7) {
+    echo "Partial scholarship";
+} else {
+    echo "No scholarship";
+}
 
 
 
