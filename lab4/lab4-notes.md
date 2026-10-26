@@ -45,7 +45,7 @@
     5b. Open requests.php ![alt text](Images/Request_Details.png)
 
     5c. CREATE: request-form.php
-        READ (one requests): process-request.php
+        READ (one requests): request-details.php
         READ (all requests): requests.php
         UPDATE: edit-requests.php
         DELETE: delete-requests.php
