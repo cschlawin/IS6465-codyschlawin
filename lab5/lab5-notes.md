@@ -9,6 +9,7 @@
 ### 1. Screenshot or pasted output showing both table names and the table schema
 
 After running the CREATE TABLE statements, the following output was produced in the SQLite shell:
+![alt text](Images/sqlite.tables.schema.png)
 
 ```
 .tables
