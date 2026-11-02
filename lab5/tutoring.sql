@@ -3,9 +3,6 @@
 -- Run with: sqlite3 tutoring.db < tutoring.sql
 -- Or interactively in the SQLite shell: sqlite3 tutoring.db
 -- Then paste or .read tutoring.sql
---
--- Note: For clean results, start with a fresh tutoring.db or delete existing tables first.
--- If you already have data, adjust the student_id values below after checking SELECT * FROM students;
 
 -- Enable foreign key enforcement (important for integrity)
 PRAGMA foreign_keys = ON;
