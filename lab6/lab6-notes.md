@@ -177,7 +177,7 @@ All integration checks passed
 **Prompt given to the AI:**  
 Explain how a tutoring request moves from `php/process-request.php` through PHP, PDO, and SQLite in this project. Identify the responsibility of each file.
 
-**AI response (summarized):**  
+**ChatGPT response (summarized):**  
 The browser form posts to `php/process-request.php`. That file receives the POST data, performs initial input checks, and hands the data to `services/requestService.php`. The service validates business rules, ensures a student record exists (via `repositories/studentPDO.php`), then inserts the request (via `repositories/requestPDO.php`). Both repository classes receive a PDO connection (opened in the config/database file) and execute prepared statements against the SQLite file `database/tutoring.db`. On success the service commits the transaction and the process page redirects to the request detail view.
 
 **My evaluation:**  
@@ -233,23 +233,10 @@ ORDER BY r.request_id;
 
 **Sample output (after my test submissions):**
 ```
-1|Jordan Lee|jordan.lee@example.edu|IS 6465|Forms|2026-11-10|14:00|Open
-2|Jordan Lee|jordan.lee@example.edu|IS 6465|SQL SELECT|2026-11-12|10:30|Open
-3|Avery Patel|avery.patel@example.edu|IS 6465|SQLite CRUD|2026-11-15|13:00|Open
-... (plus any new requests I created)
+1|Maria Lopez|maria.lopez@example.com|IS 6465|PHP arrays and forms|2026-11-03|14:00|Open
+2|Chesty Puller|chesty.puller@utah.edu|IS 6465|{"reason":"Assistance would be greatly appreciated.","topics":["Practice problems","Study plan"]}|2026-11-13|Evening|Cancelled
+3|Cody Schlaveen|cody.schlaveen@utah.edu|IS 6495|{"reason":"Assistance would be greatly appreciated.","topics":["Exam review"]}|2026-11-13|Evening|Open
 ```
 
 **What the JOIN does in this query:**  
 The `JOIN` combines rows from `tutoring_requests` (alias `r`) and `students` (alias `s`) wherever `r.student_id = s.student_id`. This lets the result include both the request details (course, topic, dates, status) and the related student’s name and email in a single result set. Without the JOIN we would only see the numeric `student_id` and would have to run a second query to look up the student’s information. The `ORDER BY r.request_id` simply sorts the combined rows by request identifier.
-
----
-
-**Required submission items included in this file:**
-- Database setup confirmation  
-- Screenshot note / confirmation of a submitted request  
-- Application testing table  
-- Workflow and file responsibility answers  
-- Explanation of why SQL belongs in repository files  
-- Integration test output  
-- AI Skills Pack prompts, responses, evaluations, traceability table, and reflection  
-- Explanation of the SQL JOIN
