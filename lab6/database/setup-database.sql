@@ -18,27 +18,3 @@ CREATE TABLE IF NOT EXISTS tutoring_requests (
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES students(student_id)
 );
-
-INSERT OR IGNORE INTO students (
-    student_name,
-    student_email
-)
-VALUES (
-    'Maria Lopez',
-    'maria.lopez@example.com'
-);
-
-INSERT OR IGNORE INTO tutoring_requests (
-    student_id,
-    course,
-    topic,
-    preferred_date,
-    preferred_time
-)
-VALUES (
-    1,
-    'IS 6465',
-    'PHP arrays and forms',
-    '2026-11-03',
-    '14:00'
-);

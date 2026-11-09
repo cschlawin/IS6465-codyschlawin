@@ -55,7 +55,7 @@ The root URL redirected to the tutoring request form. I submitted one valid test
 
 | Test | What I Did | Expected Result | Actual Result | Pass or Fail | Image |
 |------|------------|-----------------|---------------|--------------|-------|
-| Submit a valid request | Filled the form with course, topic, preferred date/time and submitted | A new tutoring request is created with status `Open` | Request appeared in the list with status Open | Pass | lab6/Images/chesty_puller_request_submission.png |
+| Submit a valid request | Filled the form with course, topic, preferred date/time and submitted | A new tutoring request is created with status `Open` | Request appeared in the list with status Open | Pass | ![alt text](Images/chesty_puller_request_submission.png) |
 | View all requests | Navigated to the request list | The new request appears in the request list | All open requests (including the new one) were shown | Pass | ![alt text](Images/chesty_puller_request_submission.png) |
 | Filter requests | Used the course or status filter | Filtering by course or status shows matching requests | Filtered list correctly showed only matching rows | Pass | ![alt text](Images/filtered_requests.png) |
 | Edit an Open request | Opened an Open request and changed the topic | The revised values are displayed | Updated topic was saved and displayed | Pass | ![alt text](Images/edit_request.png) |
@@ -101,19 +101,74 @@ SQL statements are kept in the repository layer (`studentPDO.php` and `requestPD
 
 ## Part 5: Run the Integration Tests
 
-Ran:
+### Initial run (before fix)
+On the first run of the integration tests the output showed three failures:
 
-```bash
+```FAIL Duplicate email reuses student
+FAIL UC02 course and status filter
+FAIL Invalid submission writes nothing
+...
+FAILURES: 3
+```
+
+### Cause and fix
+The failures were caused by sample data at the bottom of database/setup-database.sql. The tests create a fresh in-memory database and then execute that file, so the sample inserts changed the expected row counts.
+
+The following two statements were deleted from setup-database.sql:
+```
+INSERT OR IGNORE INTO students (
+    student_name,
+    student_email
+)
+VALUES (
+    'Maria Lopez',
+    'maria.lopez@example.com'
+);
+
+INSERT OR IGNORE INTO tutoring_requests (
+    student_id,
+    course,
+    topic,
+    preferred_date,
+    preferred_time
+)
+VALUES (
+    1,
+    'IS 6465',
+    'PHP arrays and forms',
+    '2026-11-03',
+    '14:00'
+);
+```
+After removing the sample data the schema (CREATE TABLE statements and PRAGMA) was left unchanged.
+
+### Final successful run
+**Ran:**
+```
 php tests/integration-tests.php
 ```
 
 **Complete output:**
-
 ```
+Xdebug: [Step Debug] Could not connect to debugging client. Tried: localhost:9000 (through xdebug.client_host/xdebug.client_port) :-(
+PASS UC01 create and Open
+PASS Lab 4 checkbox values preserved
+PASS Duplicate email reuses student
+PASS UC02 course and status filter
+PASS Invalid reason rejected
+PASS Invalid submission writes nothing
+PASS Edit Open request
+PASS Updated reason persisted
+PASS Cancel Open request
+PASS Cancelled row retained
+PASS Second cancellation rejected
+PASS Unrelated request unchanged
+PASS FK enforced
+PASS UC02 empty filter result
 All integration checks passed
 ```
 
-(The test file exercises request creation, retrieval, filtering, status changes, and cancellation against a temporary or the working SQLite database and reports success.)
+(The test file exercises request creation, retrieval, filtering, status changes, and cancellation against a temporary in-memory SQLite database and reports success.)
 
 ## Part 6: Use the AI Skills Pack Process
 
