@@ -4,11 +4,11 @@ Student:** Cody Schlawin
 **Course:** IS 6465 Web Application Development  
 **Date:** November 9, 2026
 
-## Part 1: Set Up the Database
+Part 1: Set Up the Database
 
 From the lab6 root I ran:
-
 ```bash
+
 sqlite3 database/tutoring.db < database/setup-database.sql
 ```
 
@@ -26,7 +26,7 @@ students
 tutoring_requests
 ```
 
-Both tables appeared as expected. The `setup-database.sql` script creates the same schema used in Lab 5 (`students` and `tutoring_requests` with the foreign-key relationship on `student_id`).
+Both tables appeared as expected. The `setup-database.sql` script creates (`students` and `tutoring_requests` with the foreign-key relationship on `student_id`).
 
 ## Part 2: Run the Application
 
