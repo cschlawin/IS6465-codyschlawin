@@ -1,14 +1,19 @@
 Lab 6 Notes: PHP, PDO, and SQLite Integration
 
-Student:** Cody Schlawin  
+**Student:** Cody Schlawin  
 **Course:** IS 6465 Web Application Development  
 **Date:** November 9, 2026
 
-Part 1: Set Up the Database
+## Part 1: Set Up the Database
+
+First I ran cd lab6 to access lab6 root.
+```bash
+
+cd lab6
+```
 
 From the lab6 root I ran:
 ```bash
-
 sqlite3 database/tutoring.db < database/setup-database.sql
 ```
 
@@ -38,24 +43,24 @@ php -S 0.0.0.0:8000
 
 Opened the application in the browser at:
 
-**URL:** `http://localhost:8000/`
+**URL:** `http://localhost:8000/php/request-form.php`
 
-The root URL redirected to the tutoring request form. I submitted one valid test request (using test data only, no real personal information).
+The root URL redirected to the tutoring request form. I submitted one valid test request using test data.
 
 **Confirmation:** The request was saved and the request detail page displayed the newly created request with status `Open`.
 
-*(Screenshot of the request detail page would be inserted here when submitting.)*
+![alt text](Images/chesty_puller_request_submission.png)
 
 ## Part 3: Test the Application Workflows
 
-| Test | What I Did | Expected Result | Actual Result | Pass or Fail |
-|------|------------|-----------------|---------------|--------------|
-| Submit a valid request | Filled the form with course, topic, preferred date/time and submitted | A new tutoring request is created with status `Open` | Request appeared in the list with status Open | Pass |
-| View all requests | Navigated to the request list | The new request appears in the request list | All open requests (including the new one) were shown | Pass |
-| Filter requests | Used the course or status filter | Filtering by course or status shows matching requests | Filtered list correctly showed only matching rows | Pass |
-| Edit an Open request | Opened an Open request and changed the topic | The revised values are displayed | Updated topic was saved and displayed | Pass |
-| Cancel an Open request | Used the cancel action on an Open request | The request status changes to `Cancelled` | Status changed to Cancelled | Pass |
-| Try to edit or cancel a cancelled request | Attempted to edit a Cancelled request | The application does not allow the change | Edit controls were disabled / request rejected | Pass |
+| Test | What I Did | Expected Result | Actual Result | Pass or Fail | Image |
+|------|------------|-----------------|---------------|--------------|-------|
+| Submit a valid request | Filled the form with course, topic, preferred date/time and submitted | A new tutoring request is created with status `Open` | Request appeared in the list with status Open | Pass | lab6/Images/chesty_puller_request_submission.png |
+| View all requests | Navigated to the request list | The new request appears in the request list | All open requests (including the new one) were shown | Pass | lab6/Images/All_submitted_requests.png |
+| Filter requests | Used the course or status filter | Filtering by course or status shows matching requests | Filtered list correctly showed only matching rows | Pass | lab6/Images/filtered_requests.png |
+| Edit an Open request | Opened an Open request and changed the topic | The revised values are displayed | Updated topic was saved and displayed | Pass | lab6/Images/edit_request.png |
+| Cancel an Open request | Used the cancel action on an Open request | The request status changes to `Cancelled` | Status changed to Cancelled | Pass | lab6/Images/uneditable_cancelled_request.png |
+| Try to edit or cancel a cancelled request | Attempted to edit a Cancelled request | The application does not allow the change | Edit controls were disabled / request rejected | Pass | lab6/Images/uneditable_cancelled_request.png |
 
 ## Part 4: Trace the Request Submission Workflow
 
