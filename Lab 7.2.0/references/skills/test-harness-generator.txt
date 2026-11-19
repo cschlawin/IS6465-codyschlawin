@@ -1,0 +1,260 @@
+
+---
+name: peer-tutoring-test-harness-generator
+description: Generate and review automated PHP CLI integration and regression tests for the IS 6465 Peer Tutoring Hub using PDO and isolated SQLite databases. Use when testing UC01 or UC02, validating form inputs and business rules, verifying database operations, checking transaction behavior, or producing executable PASS/FAIL evidence in GitHub Codespaces.
+---
+
+# Peer Tutoring Hub Test Harness Generator
+
+## Purpose
+
+Generate meaningful automated tests for the Peer Tutoring Hub.
+
+Derive expected results from approved business requirements rather than copying assumptions from application code.
+
+Help IS 6465 students understand assertions, test fixtures, database isolation, integration testing, and regression testing.
+
+## Required inputs
+
+Inspect:
+
+- Approved UC01 or UC02 acceptance criteria
+- Existing SQLite setup script
+- Relevant PHP application functions
+- Existing test harness
+- Actual function names and signatures
+
+Do not invent function names when the application files are available.
+
+If source files are missing, identify the required interfaces and clearly label generated code as provisional.
+
+## Project conventions
+
+Use:
+
+- PHP 8
+- PDO
+- SQLite
+- GitHub Codespaces
+- Existing `php/tests/` directory
+- Existing service and repository functions
+
+Preserve the approved database schema.
+
+Do not modify the working `tutoring.db` database.
+
+## Test database isolation
+
+Use a disposable SQLite database, preferably:
+
+`sqlite::memory:`
+
+Configure:
+
+- PDO exception mode
+- Associative fetch mode
+- SQLite foreign keys enabled
+
+Load the approved schema from the existing setup SQL file.
+
+If the setup script contains destructive statements, inspect and isolate the schema definitions before executing them.
+
+Do not connect automated tests to the working application database.
+
+Do not delete or overwrite real student records.
+
+## Test design workflow
+
+### Step 1: Read requirements
+
+Extract each acceptance criterion.
+
+Write its expected behavior before generating test code.
+
+### Step 2: Build a test matrix
+
+For each test identify:
+
+- Test ID
+- Requirement ID
+- Initial database state
+- Input or action
+- Expected result
+- Database assertion
+
+Include positive and negative tests.
+
+### Step 3: Inspect application interfaces
+
+Identify reusable validation, service, and repository functions.
+
+Prefer calling real application functions rather than duplicating application SQL inside tests.
+
+Use dependency injection of a PDO connection where supported.
+
+### Step 4: Prepare fixtures
+
+Create a known initial database state.
+
+Use sample student names and emails.
+
+Ensure tests are repeatable and independent.
+
+### Step 5: Generate executable tests
+
+Create PHP CLI tests using real assertions.
+
+Check returned values and database state.
+
+Catch expected exceptions only where a test explicitly requires them.
+
+Do not print PASS without checking a meaningful condition.
+
+### Step 6: Report results
+
+Print a clear PASS or FAIL message for each test.
+
+Count passed and failed assertions.
+
+Return process exit code 0 only when all tests pass.
+
+Return a nonzero exit code if any test fails or test setup cannot complete.
+
+### Step 7: Provide execution instructions
+
+Explain how to run the generated test file from the project root in GitHub Codespaces.
+
+For the standard Week 7 structure, use:
+
+`php php/tests/integration-tests.php`
+
+Verify the actual filename before presenting the command as definitive.
+
+### Step 8: Interpret evidence
+
+Distinguish generated test code from executed results.
+
+If PHP execution is unavailable, state that the tests have not been run.
+
+Do not fabricate PASS/FAIL logs.
+
+## UC01 test coverage
+
+Generate tests for:
+
+- Valid tutoring request
+- Missing required information
+- Invalid student email
+- Multiple topic selections
+- Preservation of the reason textarea
+- JSON serialization and decoding of topic data
+- Duplicate student email
+- Correct student_id foreign key
+- Default Open status
+- Retrieval through JOIN
+- Updating one Open request
+- Rejecting edits to Cancelled requests
+- Cancelling one Open request
+- Retaining the cancelled record
+- Invalid request ID
+- Quoted text and special characters
+- Transaction rollback
+- No unintended changes to unrelated rows
+
+## UC02 test coverage
+
+Generate tests for:
+
+- No filters
+- Course filter
+- Status filter
+- Combined filters
+- No matching records
+- Correct JOIN results
+- Parameterized filtering
+- Preservation of UC01 behavior
+
+## Assertions
+
+Every important test must compare actual behavior with an independently defined expected result.
+
+Example:
+
+```php
+function check(bool $condition, string $label): void
+{
+    global $passed, $failed;
+
+    if ($condition) {
+        $passed++;
+        echo "PASS: $label" . PHP_EOL;
+    } else {
+        $failed++;
+        echo "FAIL: $label" . PHP_EOL;
+    }
+}
+```
+
+Initialize `$passed` and `$failed` to zero.
+
+Finish the test script with:
+
+```php
+echo "Results: $passed passed, $failed failed"
+    . PHP_EOL;
+
+exit($failed > 0 ? 1 : 0);
+```
+
+Ensure setup failures also produce a nonzero exit status.
+
+These examples are harness components, not a complete test suite.
+
+## Regression testing
+
+After adding UC02, rerun all relevant UC01 tests.
+
+Do not remove existing tests merely because the new implementation fails them.
+
+Investigate the cause of each failure.
+
+## Test quality checks
+
+Verify:
+
+- Tests exercise actual application functions.
+- Expected outcomes come from requirements.
+- Database state is inspected after operations.
+- Invalid operations do not change records.
+- Fixtures are isolated and repeatable.
+- Failure messages identify the affected requirement.
+- The test process exits unsuccessfully when assertions fail.
+
+Recommend a controlled negative test to demonstrate that the harness can detect a failure.
+
+## Required output
+
+Provide:
+
+1. Requirements-based test matrix
+2. Test fixtures and setup
+3. Complete PHP test harness
+4. Codespaces execution command
+5. Expected output format
+6. Actual results, only if executed
+7. Coverage gaps and limitations
+8. Recommended regression tests
+
+## Security and scope
+
+Do not modify production or working classroom data.
+
+Do not add authentication, authorization, or session management as part of Week 7 testing unless specifically requested.
+
+Identify these as future security requirements.
+
+## Student learning principle
+
+Explain what each assertion proves and which business requirement it verifies.
+
+Emphasize that passing tests are evidence only when the tests themselves are correct and actually executed.

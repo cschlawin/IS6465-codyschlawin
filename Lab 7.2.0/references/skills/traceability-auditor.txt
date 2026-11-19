@@ -1,0 +1,198 @@
+
+---
+name: peer-tutoring-traceability-auditor
+description: Audit Peer Tutoring Hub PHP, PDO, and SQLite implementations against approved UC01 and UC02 business requirements. Use when reviewing generated code, checking requirements coverage, examining architectural boundaries, detecting schema drift, identifying unsupported functionality, or evaluating whether test evidence verifies application behavior.
+---
+
+# Peer Tutoring Hub Requirements Traceability Auditor
+
+## Purpose
+
+Evaluate whether the Peer Tutoring Hub application implements its approved business requirements.
+
+Distinguish between code that appears to implement a requirement and behavior that has been verified through testing.
+
+Help IS 6465 students practice forward and backward requirements traceability.
+
+## Required inputs
+
+Request or inspect:
+
+- Approved UC01 or UC02 requirements
+- Acceptance criteria and requirement IDs
+- Week 6 database schema or ERD
+- Relevant PHP source files
+- Existing test cases and results, if available
+
+Do not invent missing source files, test results, or requirements.
+
+## Project architecture
+
+Use the current Peer Tutoring Hub conventions:
+
+- `php/` contains application PHP files.
+- `php/config/db.php` configures PDO.
+- `php/repositories/studentPDO.php` contains student SQL.
+- `php/repositories/requestPDO.php` contains request SQL.
+- `php/services/requestService.php` handles workflows.
+- `php/includes/` contains shared templates and helpers.
+- `php/tests/` contains tests.
+- `database/` contains the approved SQLite schema.
+
+Preserve the Lab 4 interface, including topic checkboxes, reason textarea, course selection, and preferred-time controls.
+
+Check the documented JSON mapping used to store multiple topics and the reason in the existing `topic` column.
+
+## Audit workflow
+
+### Step 1: Establish the requirements baseline
+
+Extract each approved requirement and assign its existing identifier.
+
+Do not rewrite a requirement to match the implementation.
+
+Identify requirements that are missing, ambiguous, or not supplied.
+
+### Step 2: Perform forward traceability
+
+For each requirement, locate:
+
+1. Relevant interface controls
+2. PHP controller or page
+3. Service function
+4. Repository function and SQL
+5. Database table or column
+6. Relevant test case
+7. Actual execution evidence, if available
+
+A filename alone is insufficient evidence.
+
+Inspect the code or behavior that supports the requirement.
+
+### Step 3: Perform backward traceability
+
+Examine implemented features and important code paths.
+
+Determine which approved requirement justifies each one.
+
+Flag unexplained features, unnecessary complexity, and unapproved schema changes.
+
+### Step 4: Audit architecture
+
+Check for:
+
+- SQL embedded in presentation pages
+- HTML generated inside repository functions
+- Business workflows embedded in `config/db.php`
+- Transactions incorrectly distributed across layers
+- Incorrect or inconsistent file paths
+- Unexpected database tables or columns
+- Broken form-to-PHP field mappings
+- Changes to existing Lab 4 controls
+
+### Step 5: Audit database integrity
+
+Verify the implementation preserves:
+
+- Unique student email
+- Student-to-request foreign key
+- Default Open status
+- Targeted updates using request_id
+- Cancellation by status change rather than DELETE
+- Foreign key enforcement on PDO connections
+
+Check that database writes use parameterized SQL.
+
+### Step 6: Audit security and input handling
+
+Examine server-side validation, output encoding, HTTP methods, error handling, and transaction behavior.
+
+Flag missing authentication, authorization, and CSRF protection as known Week 7 limitations.
+
+Do not claim the classroom application is production-secure.
+
+### Step 7: Evaluate verification evidence
+
+Use these status labels:
+
+- Verified: Actual executed test evidence supports the requirement.
+- Implemented, unverified: Relevant code exists, but execution evidence is missing.
+- Partial: Only some required behavior is implemented.
+- Missing: No supporting implementation was found.
+- Failed: Available execution evidence demonstrates incorrect behavior.
+- Unknown: Insufficient information to determine status.
+
+Never mark a requirement Verified solely because a test file exists or code looks correct.
+
+## UC01 audit criteria
+
+Check:
+
+- Required inputs are validated.
+- Invalid email is rejected.
+- Existing student email reuses the student record.
+- New request links to the correct student.
+- New status is Open.
+- Confirmation retrieves saved information.
+- Only Open requests may be revised or cancelled.
+- Cancellation retains the request record.
+- Failed transactions do not leave partial writes.
+- Unrelated records remain unchanged.
+
+## UC02 audit criteria
+
+Check:
+
+- No filters returns saved requests.
+- Course filtering returns matching records.
+- Status filtering returns matching records.
+- Combined filters behave correctly.
+- No matches produce a useful empty state.
+- Student information comes from the related table.
+- Existing UC01 functionality remains intact.
+
+## Required traceability matrix
+
+Produce a table containing:
+
+| Requirement ID | Requirement | Implementation evidence | Test evidence | Status | Gap or action |
+|---|---|---|---|---|---|
+
+Identify precise file paths and function names where available.
+
+Distinguish proposed tests from executed tests.
+
+## Required audit report
+
+Provide:
+
+1. Scope and inspected materials
+2. Overall assessment
+3. Forward traceability matrix
+4. Backward traceability findings
+5. Architecture and database findings
+6. Security limitations
+7. Test evidence assessment
+8. Prioritized corrective actions
+
+Classify findings as Critical, Major, Minor, or Informational.
+
+Explain the business impact of each significant finding.
+
+## Restrictions
+
+Do not silently modify application code.
+
+Do not create new requirements to justify existing code.
+
+Do not assume tests passed.
+
+Do not change the approved database design.
+
+Do not confuse code review with runtime verification.
+
+## Student learning principle
+
+Explain why each finding matters.
+
+Help students understand the difference between a requirement, an implementation, and evidence that the implementation works.

@@ -33,8 +33,8 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     fwrite(STDERR, "A valid email address is required.\n");
     exit(1);
 }
-if (strlen($password) < 8) {
-    fwrite(STDERR, "Password must be at least 8 characters.\n");
+if (strlen($password) < 12) {
+    fwrite(STDERR, "Password must be at least 12 characters.\n");
     exit(1);
 }
 
