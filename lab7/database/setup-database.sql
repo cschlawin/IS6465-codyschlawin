@@ -1,3 +1,9 @@
+/* 
+Run with: sqlite3 tutoring.db < tutoring.sql
+-- Or interactively in the SQLite shell: sqlite3 tutoring.db
+-- Then paste or .read tutoring.sql
+*/
+
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS users (
