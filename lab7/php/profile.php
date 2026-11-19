@@ -1,54 +1,43 @@
 <?php
-// php/profile.php — UM-02 View Own Account, UM-04 Update Own Account
+// UM-02 view own account; UM-04 edit own name/email only.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../services/userService.php';
-
 $pdo = openDatabase();
 $user = requireLogin($pdo);
 $error = '';
-$success = false;
-
+$saved = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrfToken($_POST);
     try {
         updateOwnProfile($pdo, (int)$user['user_id'], (string)($_POST['full_name'] ?? ''), (string)($_POST['email'] ?? ''));
-        $success = true;
-        $user = currentUser($pdo);
+        $user = requireLogin($pdo);
+        $saved = true;
     } catch (InvalidArgumentException $e) {
         $error = $e->getMessage();
     } catch (Throwable $e) {
-        $error = 'Update failed.';
+        error_log($e->getMessage());
+        $error = 'Unable to update profile. Please check your input.';
     }
 }
-
 require __DIR__ . '/../includes/header.php';
 require __DIR__ . '/../includes/nav.php';
 ?>
-<main class="container py-4">
-    <h1>My Profile</h1>
-    <?php if ($success): ?><div class="alert alert-success">Profile updated.</div><?php endif; ?>
-    <?php if ($error): ?><div class="alert alert-danger"><?= escapeHtml($error) ?></div><?php endif; ?>
+<main class="container py-4"><h1>My Profile <small class="text-muted fs-5">UM-02 / UM-04</small></h1>
+    <?php if ($saved): ?><p class="alert alert-success">Your profile was updated.</p><?php endif; ?>
+    <?php if ($error): ?><p class="alert alert-danger"><?= escapeHtml($error) ?></p><?php endif; ?>
     <form method="post">
         <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-        <div class="mb-3">
-            <label class="form-label">Full Name</label>
-            <input type="text" name="full_name" class="form-control" value="<?= escapeHtml($user['full_name']) ?>" required maxlength="100">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" value="<?= escapeHtml($user['email']) ?>" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Role</label>
-            <input type="text" class="form-control" value="<?= escapeHtml($user['role']) ?>" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Status</label>
-            <input type="text" class="form-control" value="<?= escapeHtml($user['status']) ?>" readonly>
-        </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="change-password.php" class="btn btn-outline-secondary">Change Password</a>
+        <div class="mb-3"><label class="form-label" for="full_name">Full Name</label>
+            <input id="full_name" name="full_name" class="form-control" required maxlength="100" value="<?= escapeHtml($user['full_name']) ?>"></div>
+        <div class="mb-3"><label class="form-label" for="email">Email</label>
+            <input id="email" name="email" type="email" class="form-control" required maxlength="254" value="<?= escapeHtml($user['email']) ?>"></div>
+        <div class="mb-3"><label class="form-label" for="role">Role (read-only)</label>
+            <input id="role" class="form-control" value="<?= escapeHtml($user['role']) ?>" readonly></div>
+        <div class="mb-3"><label class="form-label" for="status">Status (read-only)</label>
+            <input id="status" class="form-control" value="<?= escapeHtml($user['status']) ?>" readonly></div>
+        <button class="btn btn-primary" type="submit">Save Changes</button>
+        <a class="btn btn-outline-secondary" href="change-password.php">Change Password</a>
     </form>
 </main>
 <?php require __DIR__ . '/../includes/footer.php'; ?>

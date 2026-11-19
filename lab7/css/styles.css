@@ -141,9 +141,7 @@ main form input[type="radio"] {
     cursor: pointer;
 }
 
-/*
- * Grid placement for remaining fields
- */
+/* Course */
 
 main form label[for="course"] {
     grid-column: 1;
@@ -154,6 +152,8 @@ main form #course {
     grid-column: 1;
     grid-row: 3;
 }
+
+/* Help topic */
 
 main form label[for="topic"] {
     grid-column: 1;

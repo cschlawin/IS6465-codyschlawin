@@ -1,10 +1,9 @@
 <?php
-// php/logout.php — UM-10 Log Out
+// UM-10: POST + CSRF. Destroy server session and expire the session cookie.
 require_once __DIR__ . '/../includes/auth.php';
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    exit('POST required');
+    exit('POST required.');
 }
 verifyCsrfToken($_POST);
 logoutSession();

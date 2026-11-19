@@ -1,29 +1,22 @@
-/* 
-Run with: sqlite3 tutoring.db < tutoring.sql
--- Or interactively in the SQLite shell: sqlite3 tutoring.db
--- Then paste or .read tutoring.sql
-*/
-
+-- Fresh Lab 7.2.0 schema. No destructive DROP statements or example accounts.
+-- Lab 6 student/request columns and topic JSON storage are preserved.
 PRAGMA foreign_keys = ON;
-
 CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY,
     full_name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT NOT NULL UNIQUE COLLATE NOCASE,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL CHECK(role IN ('Student', 'Tutor', 'Administrator')),
     status TEXT NOT NULL DEFAULT 'Active' CHECK(status IN ('Active', 'Inactive')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE IF NOT EXISTS students (
     student_id INTEGER PRIMARY KEY,
     student_name TEXT NOT NULL,
     student_email TEXT NOT NULL UNIQUE,
-    user_id INTEGER,
-    FOREIGN KEY(user_id) REFERENCES users(user_id)
+    user_id INTEGER UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE RESTRICT
 );
-
 CREATE TABLE IF NOT EXISTS tutoring_requests (
     request_id INTEGER PRIMARY KEY,
     student_id INTEGER NOT NULL,
@@ -33,9 +26,5 @@ CREATE TABLE IF NOT EXISTS tutoring_requests (
     preferred_time TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Open' CHECK(status IN ('Open','Cancelled','Assigned','Completed')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(student_id) REFERENCES students(student_id)
+    FOREIGN KEY (student_id) REFERENCES students(student_id)
 );
-
--- Sample seed (password hashes must be generated with password_hash; replace or use seed-users.php)
--- INSERT OR IGNORE INTO users (full_name, email, password_hash, role, status) VALUES
--- ('Admin User', 'admin@example.edu', '$2y$10$examplehashforPassw0rd!', 'Administrator', 'Active');

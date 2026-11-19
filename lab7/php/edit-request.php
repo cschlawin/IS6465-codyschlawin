@@ -1,60 +1,44 @@
 <?php
-// php/edit-request.php — protected
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../services/requestService.php';
-
 $pdo = openDatabase();
 $user = requireLogin($pdo);
-requireRole($user, ['Student', 'Administrator']);
-
-$id = filter_input(INPUT_GET, 'request_id', FILTER_VALIDATE_INT);
-if (!$id || $id < 1) {
-    http_response_code(400);
-    exit('Invalid ID');
-}
-$ownerId = ($user['role'] === 'Student') ? (int)$user['user_id'] : null;
-$r = findRequest($pdo, $id, $ownerId);
-if (!$r) {
-    http_response_code(404);
-    exit('Not found');
-}
-$topic = decodeTopic($r['topic']);
+requireRole($user, ['Student','Administrator']);
+$id = filter_var($_GET['request_id'] ?? null, FILTER_VALIDATE_INT);
+if (!$id || $id < 1) { http_response_code(400); exit('Invalid request ID.'); }
+$owner = $user['role'] === 'Student' ? (int)$user['user_id'] : null;
+$request = findRequest($pdo, (int)$id, $owner);
+if (!$request) { http_response_code(404); exit('Request not found.'); }
+$topic = decodeTopic($request['topic']);
 require __DIR__ . '/../includes/header.php';
 require __DIR__ . '/../includes/nav.php';
 ?>
-<main class="container py-4">
-    <h1>Edit request #<?= (int)$id ?></h1>
-    <?php if ($r['status'] !== 'Open'): ?>
-        <p>Only Open requests may be edited.</p>
-    <?php else: ?>
+<main class="container py-4"><h1>Edit Request #<?= (int)$id ?></h1>
+    <?php if ($request['status'] !== 'Open'): ?><p>Only Open requests can be edited.</p><?php else: ?>
         <form method="post" action="update-request.php">
-            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <input type="hidden" name="request_id" value="<?= (int)$id ?>">
-            <label class="form-label" for="course">Course</label>
-            <select class="form-select mb-3" id="course" name="course">
-                <?php foreach (['IS 6465', 'IS 6495', 'IS 6570'] as $c): ?>
-                    <option value="<?= escapeHtml($c) ?>" <?= $c === $r['course'] ? 'selected' : '' ?>><?= escapeHtml($c) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <label class="form-label" for="reason">What would you like help with?</label>
-            <textarea class="form-control mb-3" id="reason" name="reason" minlength="10" maxlength="500" required><?= escapeHtml($topic['reason']) ?></textarea>
-            <label class="form-label" for="preferreddate">Preferred date</label>
-            <input class="form-control mb-3" id="preferreddate" name="preferreddate" type="date" value="<?= escapeHtml($r['preferred_date']) ?>" required>
-            <fieldset>
-                <legend>Topics</legend>
-                <?php foreach (['Exam review', 'Practice problems', 'Study plan'] as $t): ?>
+            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <div class="mb-3"><label class="form-label" for="course">Course</label>
+                <select class="form-select" id="course" name="course" required>
+                    <?php foreach (['IS 6465','IS 6495','IS 6570'] as $c): ?><option value="<?= $c ?>" <?= $request['course'] === $c ? 'selected' : '' ?>><?= $c ?></option><?php endforeach; ?>
+                </select></div>
+            <div class="mb-3"><label class="form-label" for="preferreddate">Preferred Date</label>
+                <input class="form-control" id="preferreddate" type="date" name="preferreddate" value="<?= escapeHtml($request['preferred_date']) ?>" required></div>
+            <fieldset class="mb-3"><legend class="fs-6">Topics</legend>
+                <?php foreach (['Exam review','Practice problems','Study plan'] as $t): ?>
                     <label class="me-3"><input type="checkbox" name="topics[]" value="<?= escapeHtml($t) ?>" <?= in_array($t, $topic['topics'], true) ? 'checked' : '' ?>> <?= escapeHtml($t) ?></label>
                 <?php endforeach; ?>
             </fieldset>
-            <fieldset>
-                <legend>Preferred time</legend>
-                <?php foreach (['Morning', 'Afternoon', 'Evening'] as $t): ?>
-                    <label class="me-3"><input type="radio" name="preferredtime" value="<?= escapeHtml($t) ?>" <?= $t === $r['preferred_time'] ? 'checked' : '' ?> required> <?= escapeHtml($t) ?></label>
+            <div class="mb-3"><label class="form-label" for="reason">Reason / Details</label>
+                <textarea class="form-control" name="reason" id="reason" minlength="10" maxlength="500" required><?= escapeHtml($topic['reason']) ?></textarea></div>
+            <fieldset class="mb-3"><legend class="fs-6">Preferred Time</legend>
+                <?php foreach (['Morning','Afternoon','Evening'] as $time): ?>
+                    <label class="me-3"><input type="radio" name="preferredtime" value="<?= $time ?>" <?= $request['preferred_time'] === $time ? 'checked' : '' ?> required> <?= $time ?></label>
                 <?php endforeach; ?>
             </fieldset>
-            <button class="btn btn-primary mt-3">Save changes</button>
-            <a class="btn btn-secondary mt-3" href="request-details.php?request_id=<?= (int)$id ?>">Back</a>
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+            <a class="btn btn-outline-secondary" href="request-details.php?request_id=<?= (int)$id ?>">Cancel</a>
         </form>
     <?php endif; ?>
 </main>
