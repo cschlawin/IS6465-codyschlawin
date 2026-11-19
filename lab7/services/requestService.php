@@ -2,7 +2,9 @@
 require_once dirname(__DIR__).'/includes/validation.php';
 require_once dirname(__DIR__).'/repositories/studentPDO.php';
 require_once dirname(__DIR__).'/repositories/requestPDO.php';
-function escapeHtml($v) {return htmlspecialchars((string)$v,ENT_QUOTES,'UTF-8');}
+if (!function_exists('escapeHtml')) {
+    function escapeHtml($v) {return htmlspecialchars((string)$v,ENT_QUOTES,'UTF-8');}
+}
 // Week 4 form fields map to the Week 6 schema without adding database columns.
 // topic contains JSON {reason,topics}; preferred_time stores Morning/Afternoon/Evening.
 function decodeTopic($topic) {

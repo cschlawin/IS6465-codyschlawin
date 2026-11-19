@@ -70,6 +70,8 @@ function logoutSession(): void {
     session_destroy();
 }
 
-function escapeHtml(string $s): string {
-    return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+if (!function_exists('escapeHtml')) {
+    function escapeHtml(string $s): string {
+        return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
 }
