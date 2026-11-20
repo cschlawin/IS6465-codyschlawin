@@ -116,6 +116,7 @@ The application opened successfully. Visiting a protected page such as `php/requ
 
 Screenshot: insert one screenshot of registration, the student profile, a submitted tutoring request, or the student request list.
 <img width="904" height="464" alt="image" src="https://github.com/user-attachments/assets/a11b7c20-499e-4257-af3e-f1219da5d804" />
+<img width="949" height="692" alt="image" src="https://github.com/user-attachments/assets/4b0710ca-5f6a-4bc3-a65b-376614d8276b" />
 
 ## Part 6: Test the Administrator Workflow
 
