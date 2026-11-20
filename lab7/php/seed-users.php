@@ -8,9 +8,9 @@ require_once __DIR__ . '/../repositories/studentPDO.php';
 $pdo = openDatabase();
 
 $samples = [
-    ['Admin User', 'admin@example.edu', 'AdminPass1!', 'Administrator'],
-    ['Alex Student', 'alex@example.edu', 'StudentPass1!', 'Student'],
-    ['Taylor Tutor', 'taylor@example.edu', 'TutorPass1!', 'Tutor'],
+    ['Admin User', 'admin@example.edu', 'xyzxyzxyz', 'Administrator'],
+    ['Alex Student', 'alex@example.edu', 'xyzxyzxyz', 'Student'],
+    ['Taylor Tutor', 'taylor@example.edu', 'xyzxyzxyz', 'Tutor'],
 ];
 
 foreach ($samples as [$name, $email, $pass, $role]) {
