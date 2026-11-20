@@ -6,7 +6,7 @@ Repository: cschlawin/IS6465-codyschlawin (lab7 folder)
 
 ## Part 1: Generate the Lab 7 Application
 
-### AI prompt used
+### AI prompt used in ChatGPT
 ```
 Lab 7 Authentication
 Review Peer_Tutoring_Hub_User_Management_With_Diagrams.docx., skills pack.zip, lab6.zip document and IS6465_Week8_Authentication_Lecture_v2.1.
@@ -100,23 +100,22 @@ From the lab7 project root:
 php -S 0.0.0.0:8000
 ```
 
-Browser URL opened: the Codespaces forwarded port 8000 URL (or `http://127.0.0.1:8000/php/login.php`).
-
 The application opened successfully. Visiting a protected page such as `php/requests.php` or `php/request-form.php` without a session redirected the browser to `login.php`. That behavior comes from `requireLogin()` in `includes/auth.php`, which checks for a valid active session and, if none exists, sends the user to the login page.
 
 ## Part 5: Test the Student Workflow
 
 | Test | What I Did | Expected Result | Actual Result | Pass or Fail |
 |------|------------|-----------------|---------------|--------------|
-| Register student account | | Student account is created | | |
-| Log in as student | | Student can access protected student pages | | |
-| View or update profile | | Profile information is displayed or saved | | |
-| Create tutoring request | | A new request is created with status Open | | |
-| Edit Open request | | Updated request information is displayed | | |
-| View my requests | | Student sees the student’s own requests | | |
-| Log out | | Session ends and login page appears | | |
+| Register student account | Entered Full Name, email, password and confirmation password, checked student | Student account is created | Yes | |
+| Log in as student | typed eamil and password, clicked log In | Student can access protected student pages | Yes | |
+| View or update profile | Selected view from requests, edit, revisions saved | Profile information is displayed or saved | Yes | |
+| Create tutoring request | Logged in a Bill Moore, Request a Session, completed all fields and request was submitted | A new request is created with status Open | Yes | |
+| Edit Open request | Edit, PLEASE!, Saved | Updated request information is displayed | Yes | |
+| View my requests | Yes able to see my own requests | Student sees the student’s own requests | Yes | |
+| Log out | Logged Out, Notification 'You have been logged out', returned to log in page | Session ends and login page appears | Yes | |
 
 Screenshot: insert one screenshot of registration, the student profile, a submitted tutoring request, or the student request list.
+<img width="904" height="464" alt="image" src="https://github.com/user-attachments/assets/a11b7c20-499e-4257-af3e-f1219da5d804" />
 
 ## Part 6: Test the Administrator Workflow
 
@@ -138,26 +137,30 @@ A Student can register, log in, view and update their own profile, create a tuto
 Logout destroys the session. Visiting a protected page such as requests.php or profile.php then calls `requireLogin()`, finds no valid session, and redirects the browser to login.php.
 
 Screenshot: insert one screenshot of the administrator user list or the all-requests view.
+<img width="954" height="694" alt="image" src="https://github.com/user-attachments/assets/fd65f1aa-8798-453a-a2ab-8ab2cde00b52" />
 
 ## Part 7: Trace Registration and Login
 
 ### Student registration workflow
-- Which file displays the Create Account form?
-- Which file receives the submitted registration form?
-- Which file or function creates and verifies the CSRF token?
-- Which service validates the registration information?
-- Where is the password hashed?
+- Which file displays the Create Account form? php/register.php
+- Which file receives the submitted registration form? php/register.php — the form posts back to itself. On POST it calls verifyCsrfToken() and then registerUser().
+- Which file or function creates and verifies the CSRF token? includes/auth.php csrfToken() creates and stores the token in the session verifyCsrfToken() checks the token submitted with the form.
+- Which service validates the registration information? services/userService.php — validateRegistration() checks the input, and registerUser() calls it before inserting anything.
+- Where is the password hashed? In registerUser() in services/userService.php, with: password_hash($data['password'], PASSWORD_DEFAULT).
+Only the hash is passed to the repository.
 - Which repository files insert user and student data?
-- Which database tables receive records when a student registers?
+repositories/userPDO.php — insertUser() and linkStudentToUser()
+repositories/studentPDO.php — insertStudentIfAbsent()
+- Which database tables receive records when a student registers? users — the account (name, email, password hash, role, status) students — the linked student profile (name, email, user_id)
 
 ### User login workflow
-- Which file displays the login form? `php/login.php`.
-- Which file receives the submitted login credentials? `php/login.php` (posts back to itself).
-- Which repository retrieves a user by email address? `findUserByEmail()` in `repositories/userPDO.php`.
-- Where is the submitted password verified? In `authenticate()` in `services/userService.php`, with `password_verify`.
-- What session actions occur after successful login? `loginUser()` in `includes/auth.php` regenerates the session id, stores `user_id` and `role` in the session, and ensures a CSRF token exists.
+- Which file displays the login form? php/login.php.
+- Which file receives the submitted login credentials? php/login.php (posts back to itself).
+- Which repository retrieves a user by email address? findUserByEmail() in `repositories/userPDO.php`.
+- Where is the submitted password verified? In authenticate() in services/userService.php, with password_verify.
+- What session actions occur after successful login? loginUser() in includes/auth.php regenerates the session id, stores user_id and `role` in the session, and ensures a CSRF token exists.
 - Why should the application regenerate the session ID after login? To prevent session fixation. An attacker who set a session id before login cannot continue using that same id after the user authenticates.
-- How does the application determine whether the logged-in user is a student or administrator? The role is stored in the session at login and is also re-read from the `users` table by `currentUser()`. Pages then call `requireRole()` with the allowed role list.
+- How does the application determine whether the logged-in user is a student or administrator? The role is stored in the session at login and is also re-read from the `users` table by currentUser(). Pages then call `requireRole()` with the allowed role list.
 
 Flow: Browser → login.php → CSRF check → userService authenticate → userPDO findUserByEmail → password_verify → loginUser → SQLite (`users`).
 
@@ -195,9 +198,9 @@ If any integration test failed: name the failed test, describe what it checked, 
 ### Application Builder
 Prompt: Explain how a student registration request moves from register.php through authentication checks, PHP services, repositories, PDO, and SQLite in the Peer Tutoring Hub application. Identify the responsibility of each file or layer.
 
-Response summary: The AI described the path Browser → register.php → CSRF check → userService → userPDO/studentPDO → SQLite, with the page handling the form, the service validating and hashing, and the repositories performing the inserts.
+The AI described the path Browser → register.php → CSRF check → userService → userPDO/studentPDO → SQLite, with the page handling the form, the service validating and hashing, and the repositories performing the inserts.
 
-Evaluation: One accurate statement is that the password is hashed in the service layer before the repository insert. I verified this in `services/userService.php`: `registerUser()` calls `password_hash` and then passes only the hash to `insertUser()`. The page never sees the hash, and the repository never sees the plaintext password.
+Evaluation: One accurate statement is that the password is hashed in the service layer before the repository insert. I verified this in services/userService.php: registerUser() calls password_hash and then passes only the hash to insertUser(). The page never sees the hash, and the repository never sees the plaintext password.
 
 ### Traceability Auditor
 
@@ -213,7 +216,10 @@ Suggested test: An Inactive student cannot log in.
 
 Already covered? Yes. `user-management-tests.php` sets a user to Inactive and asserts that `authenticate()` returns null.
 
-How I would test it: Manually, an administrator sets the student to Inactive on admin-manage-user.php, then the student tries to log in and should see “Invalid email, password, or inactive account.”
+How I would test it: Manually, an administrator sets the student to Inactive on admin-manage-user.php, then the student tries to log in and should see “Invalid email, password, or inactive account.” 
+Placed James Ho's administrator account to 'inactive' saved update and attempted to login. 
+<img width="896" height="590" alt="image" src="https://github.com/user-attachments/assets/1b44f766-94fa-47d2-a56f-51d36f1a6a16" />
+
 
 Is the AI test appropriate? Yes. It matches UM-07 and the lecture requirement that only Active accounts can authenticate.
 
