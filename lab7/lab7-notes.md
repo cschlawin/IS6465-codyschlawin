@@ -69,8 +69,8 @@ SELECT * FROM sqlite_schema;
 **Confirmation:** All three required tables appeared: `students`, `tutoring_requests`, and `users`.
 
 Screenshot evidence: `.tables` output shows `students  tutoring_requests  users`. `.schema` shows the `users` table (user_id, full_name, email, password_hash, role, status, created_at), the `students` table with `user_id` and the foreign key to `users`, and `tutoring_requests` with the foreign key to `students`.
-
-Note: Running the upgrade script on a database that already had `students.user_id` produced `Error: near line 33: duplicate column name: user_id`. That message means the column was already present; the upgrade was already applied. The three tables were confirmed with `.tables`.
+![alt text](Images/image.png)
+![alt text](Images/image2.png)
 
 ## Part 3: Create an Administrator Account
 
@@ -96,17 +96,17 @@ php create-admin.php "Chesty Puller" chesty@usmc.edu "************"
 
 Browser URL opened: *(fill in)*
 
-The application opened successfully: *(yes/no)*
+The application opened successfully: Yes
 
 What happened when I first accessed a protected page without being logged in:
-*(Expected: redirected to login.php. Record what you observed.)*
+redirected to login.php. Record what you observed.
 
 ## Part 5: Test the Student Workflow
 
 | Test | What I Did | Expected Result | Actual Result | Pass or Fail |
 |------|------------|-----------------|---------------|--------------|
-| Register student account | | Student account is created | | |
-| Log in as student | | Student can access protected student pages | | |
+| Register student account |  | Student account is created | | |
+| Log in as student |  | Student can access protected student pages | | |
 | View or update profile | | Profile information is displayed or saved | | |
 | Create tutoring request | | A new request is created with status Open | | |
 | Edit Open request | | Updated request information is displayed | | |
@@ -139,7 +139,7 @@ Screenshot: *(insert one screenshot of the user list or all tutoring requests wh
 ## Part 7: Trace Registration and Login
 
 ### Student registration workflow
-- Which file displays the Create Account form?
+- Which file displays the Create Account form? 
 - Which file receives the submitted registration form?
 - Which file or function creates and verifies the CSRF token?
 - Which service validates the registration information?
