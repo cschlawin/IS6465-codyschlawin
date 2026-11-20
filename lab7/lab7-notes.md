@@ -177,13 +177,16 @@ php tests/integration-tests.php
 Paste the complete browser or terminal output from each command below. The three scripts produce an HTML results table when opened in the browser.
 
 **validation-tests.php:** expected Pass — 10 of 10 (preferred time, topics, reason).  
-*(paste complete output)*
+<img width="1589" height="636" alt="image" src="https://github.com/user-attachments/assets/c6cdc805-dae6-4614-aeaa-599e1ab25d1f" />
+
 
 **user-management-tests.php:** expected Pass — registration, duplicate email, admin denial, login, password change, profile update, inactive login.  
-*(paste complete output)*
+<img width="1551" height="560" alt="image" src="https://github.com/user-attachments/assets/eabf594f-77b4-4abd-b0cc-3f7e2c2b7b2c" />
+
 
 **integration-tests.php:** expected Pass — create, filter, edit, cancel, foreign key.  
-*(paste complete output)*
+<img width="1568" height="752" alt="image" src="https://github.com/user-attachments/assets/86db0779-51df-4b68-a763-bd08d7af1680" />
+
 
 If any integration test failed: name the failed test, describe what it checked, and note what code, requirement, or database behavior may need investigation. Do not change the test files unless the instructor directs you to do so.
 
