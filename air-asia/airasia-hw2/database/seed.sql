@@ -1,5 +1,4 @@
--- Coursework fixtures only. Password values below are PHP-generated hashes.
--- Grading login: bsmith / mysecret (Admin), pjones / acrobat (Customer).
+-- Coursework fixtures only. Password values below are PHP-generated hashes, refer to HW4 for User passwords. 
 -- Existing IDs/rows are preserved; setup does not reset balances or cards.
 -- Existing HW3 account userIds 1-5 now link to these USER records.
 INSERT INTO USER (userId, userName, password, firstName, lastName, role) VALUES
