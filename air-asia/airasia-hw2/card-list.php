@@ -1,14 +1,13 @@
 <?php
 // UC-01 / FR-01: read the saved catalog;
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/authorization.php';
+$user = requireLogin($pdo);
 if ($dbError !== null) {
   show_error($dbError, 503);
 }
 try {
-  $cards = $pdo->query(
-    'SELECT cardId, cardName, cardType, cardValue, points '
-    . 'FROM GIFTCARD ORDER BY cardId'
-  )->fetchAll();
+  $cards = listCards($pdo);
 } catch (PDOException $exception) {
   error_log('Air Asia list: ' . $exception->getMessage());
   show_error('Unable to load gift cards. Please try again later.', 503);
@@ -23,7 +22,9 @@ require_once __DIR__ . '/includes/nav.php';
           <h1>Gift Cards</h1>
           <p class="muted">Explore gift cards from your favorite brands.</p>
         </div>
-        <a class="button" href="card-add.php">+ Add Gift Card</a>
+        <?php if ($user['role'] === 'Admin'): ?>
+          <a class="button" href="card-add.php">+ Add Gift Card</a>
+        <?php endif; ?>
       </section>
       <?php if ($cards === []): ?>
         <section class="panel form-panel">

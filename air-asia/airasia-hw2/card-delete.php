@@ -1,6 +1,9 @@
 <?php
 // UC-05 / FR-05, BR-06: GET previews; only affirmative POST deletes.
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/authorization.php';
+$user = requireLogin($pdo);
+requireRole($user, ['Admin']);
 $cardId = positive_integer($_GET['card_id'] ?? null);
 if ($cardId === null) {
   show_error('Choose a gift card using a valid positive integer card ID.');
@@ -19,23 +22,24 @@ if ($card === null) {
 }
 $formError = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  verifyCsrfToken($_POST);
   if (($_POST['confirm'] ?? null) !== 'yes') {
     $formError = 'Deletion was not confirmed. Nothing was changed.';
     http_response_code(422);
   } else {
     try {
-      $statement = $pdo->prepare('DELETE FROM GIFTCARD WHERE cardId = :cardId');
-      $statement->bindValue(':cardId', $cardId, PDO::PARAM_INT);
-      $statement->execute();
-      if ($statement->rowCount() === 0) {
+      $deleted = deleteGiftCard($pdo, $cardId);
+      if (!$deleted) {
         show_error('This gift card is no longer available.', 404);
       }
       header('Location: card-list.php', true, 303);
       exit;
     } catch (PDOException $exception) {
       error_log('Air Asia delete: ' . $exception->getMessage());
-      $formError = 'Unable to delete this gift card. Please try again later.';
-      http_response_code(503);
+      $formError = $exception->getCode() === '23000'
+        ? 'This card has redemption history and cannot be deleted.'
+        : 'Unable to delete this gift card. Please try again later.';
+      http_response_code($exception->getCode() === '23000' ? 409 : 503);
     }
   }
 }
@@ -67,6 +71,7 @@ require_once __DIR__ . '/includes/nav.php';
           <p class="error-summary" role="alert"><?= e($formError) ?></p>
         <?php endif; ?>
         <form action="card-delete.php?card_id=<?= e($cardId) ?>" method="post">
+            <?= csrfField() ?>
           <div class="form-actions">
             <button class="button" name="confirm" value="yes" type="submit">
               Confirm Delete

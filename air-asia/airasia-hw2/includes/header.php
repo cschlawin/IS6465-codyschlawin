@@ -2,6 +2,7 @@
 require_once __DIR__ . '/validation.php';
 $basePath = $basePath ?? '';
 $pageTitle = $pageTitle ?? 'Gift Cards';
+$brandPage = isset($user) ? 'card-list.php' : 'login.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +16,7 @@ $pageTitle = $pageTitle ?? 'Gift Cards';
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="header-inner">
-        <a class="brand" href="<?= e($basePath) ?>card-list.php"
+        <a class="brand" href="<?= e($basePath . $brandPage) ?>"
           aria-label="Air Asia Rewards gift cards">
           <span class="brand-mark">AirAsia</span>
           <span>
