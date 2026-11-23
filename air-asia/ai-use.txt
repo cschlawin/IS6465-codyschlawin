@@ -10,7 +10,7 @@ Student review: Review the source, test it in Codespaces, and revise this disclo
 Revision: Formatted HTML/CSS with two-space indentation and an 80-column target. Enabled Codespaces editor word wrap. Made login branding non-interactive; later-page brand links remain. This static simulation has no sessions or direct-URL protection.
 
 
-PROMPTS AND CONVERSATION TRANSCRIPT
+PROMPTS AND CONVERSATION TRANSCRIPT - OpenAI ChatGPT / Codex (gpt-6.1-sol)
 Added: October 20, 2026
 Project: IS 6465 Air Asia Website
 Repository: https://github.com/cschlawin/air-asia
