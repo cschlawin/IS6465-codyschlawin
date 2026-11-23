@@ -16,23 +16,23 @@ The Peer Tutoring Hub gives students a way to request help with a course. A stud
 
 ### 2. Identify one route used by the application. What URL or action causes that route to run?
 
-One route is POST /requests, defined in routes/web.php. It runs when someone completes the **Request a tutoring session** form and clicks **Request session**. The route points to the `store` method of `TutoringRequestController`. Another route, `GET /requests`, displays the list of requests.
+One route is POST /requests, defined in routes/web.php. It runs when someone completes the Request a tutoring session form and clicks Request session. The route points to the store method of TutoringRequestController. Another route, GET /requests, displays the list of requests.
 
 ### 3. Identify the controller involved in one application workflow. What is it responsible for?
 
-`TutoringRequestController.php` handles the tutoring-request workflow. Its `create()` method opens the form, `store()` validates the submitted information and saves it, `index()` loads the request list, and `show()` displays a selected request. The controller connects the incoming request to the database model and the correct view.
+TutoringRequestController.php handles the tutoring-request workflow. Its create() method opens the form, store() validates the submitted information and saves it, index() loads the request list, and show() displays a selected request. The controller connects the incoming request to the database model and the correct view.
 
 ### 4. Identify one model. What business data does it represent?
 
-The `TutoringRequest` model in `app/Models/TutoringRequest.php` represents a tutoring request stored in the `tutoring_requests` database table. The data includes the course, reason for seeking help, topics, preferred date, and preferred time. The table also has a request ID, status, and timestamps. Laravel's Eloquent model makes it possible to create and retrieve these records without writing a separate SQL query for every action.
+The TutoringRequest model in app/Models/TutoringRequest.php represents a tutoring request stored in the tutoring_requests database table. The data includes the course, reason for seeking help, topics, preferred date, and preferred time. The table also has a request ID, status, and timestamps. Laravel's Eloquent model makes it possible to create and retrieve these records without writing a separate SQL query for every action.
 
 ### 5. Identify one Blade view. What does the user see or do on that page?
 
-The `resources/views/requests/create.blade.php` view displays the request form. The student can choose a course, select a preferred date and time, describe the help needed, and check one or more topics. If validation fails, the page shows error messages and keeps previous entries. It uses the shared `layouts/app.blade.php` layout for the header, navigation, and footer.
+The resources/views/requests/create.blade.php view displays the request form. The student can choose a course, select a preferred date and time, describe the help needed, and check one or more topics. If validation fails, the page shows error messages and keeps previous entries. It uses the shared layouts/app.blade.php layout for the header, navigation, and footer.
 
 ### 6. Explain how a request moves through MVC for one workflow.
 
-For the **submit a tutoring request** workflow, the form in `requests/create.blade.php` sends a `POST` request to `/requests`. The route in `routes/web.php` calls `TutoringRequestController::store()`. The controller validates the fields, including the allowed course and topics, description length, and preferred date. If the data is valid, the controller calls `TutoringRequest::create()` to save a new record in SQLite through the Eloquent model. Laravel then redirects the browser to the named `requests.show` route at `/requests/{tutoringRequest}`. Route model binding loads the saved request, `show()` sends it to the `requests/show.blade.php` view, and Blade renders the confirmation and saved details. If validation fails, Laravel returns to the form with errors instead of creating a record.
+For the submit a tutoring request workflow, the form in requests/create.blade.php sends a POST request to /requests. The route in routes/web.php calls TutoringRequestController::store(). The controller validates the fields, including the allowed course and topics, description length, and preferred date. If the data is valid, the controller calls TutoringRequest::create() to save a new record in SQLite through the Eloquent model. Laravel then redirects the browser to the named requests.show route at /requests/{tutoringRequest}. Route model binding loads the saved request, show() sends it to the requests/show.blade.php view, and Blade renders the confirmation and saved details. If validation fails, Laravel returns to the form with errors instead of creating a record.
 
 ### 7. Compare Laravel's MVC organization with the architecture used in your course project.
 
@@ -49,13 +49,13 @@ A major difference I noticed while exploring Laravel was how URLs and PHP files 
 
 | MVC area | File inspected | What it does |
 | --- | --- | --- |
-| Route | `app/routes/web.php` | <img width="1008" height="772" alt="image" src="https://github.com/user-attachments/assets/fda09b9b-9092-4881-9c06-200db7661eed" />
+| Route | app/routes/web.php | <img width="1008" height="772" alt="image" src="https://github.com/user-attachments/assets/fda09b9b-9092-4881-9c06-200db7661eed" />
  |
-| Controller | `app/app/Http/Controllers/TutoringRequestController.php` | <img width="819" height="247" alt="image" src="https://github.com/user-attachments/assets/07767a11-4cad-4448-952c-4858b0f69def" />
+| Controller | app/app/Http/Controllers/TutoringRequestController.php | <img width="819" height="247" alt="image" src="https://github.com/user-attachments/assets/07767a11-4cad-4448-952c-4858b0f69def" />
  |
-| Model | `app/app/Models/TutoringRequest.php` | <img width="925" height="546" alt="image" src="https://github.com/user-attachments/assets/eb0de098-9519-42c3-92b0-af6c2350bdff" />
+| Model | app/app/Models/TutoringRequest.php | <img width="925" height="546" alt="image" src="https://github.com/user-attachments/assets/eb0de098-9519-42c3-92b0-af6c2350bdff" />
  |
-| View | `app/resources/views/requests/create.blade.php` | <img width="1063" height="760" alt="image" src="https://github.com/user-attachments/assets/2a135a5c-c4b5-48b4-a40c-6dc2dc8b53ec" />
+| View | app/resources/views/requests/create.blade.php | <img width="1063" height="760" alt="image" src="https://github.com/user-attachments/assets/2a135a5c-c4b5-48b4-a40c-6dc2dc8b53ec" />
  |
 
 
