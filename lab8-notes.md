@@ -18,7 +18,7 @@ The Peer Tutoring Hub gives students a way to request help with a course. A stud
 
 ### 2. Identify one route used by the application. What URL or action causes that route to run?
 
-One route is `POST /requests`, defined in `routes/web.php`. It runs when someone completes the **Request a tutoring session** form and clicks **Request session**. The route points to the `store` method of `TutoringRequestController`. Another route, `GET /requests`, displays the list of requests.
+One route is POST /requests, defined in routes/web.php. It runs when someone completes the **Request a tutoring session** form and clicks **Request session**. The route points to the `store` method of `TutoringRequestController`. Another route, `GET /requests`, displays the list of requests.
 
 ### 3. Identify the controller involved in one application workflow. What is it responsible for?
 
