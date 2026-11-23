@@ -7,13 +7,8 @@
 **My Codespaces/repository link:** [Add the link to your own fork or Codespace here]
 
 **Completion checklist (mark only after doing these steps):**
+<img width="1897" height="984" alt="image" src="https://github.com/user-attachments/assets/a5ff6fa0-4fd0-4541-9fec-47921850997a" />
 
-- [ ] Created my Codespace from the starter repository (or my fork of it).
-- [ ] Installed Composer dependencies, configured `.env`, generated the application key, and ran migrations.
-- [ ] Started the application and opened port 8000 in the browser.
-- [ ] Submitted a fictional tutoring request and saw the saved request details.
-- [ ] Returned to **All requests** and reopened the saved request.
-- [ ] Tried at least one invalid form input and saw the validation message.
 
 ## Part 2: Exploring MVC
 
