@@ -49,14 +49,10 @@ A major difference I noticed while exploring Laravel was how URLs and PHP files 
 
 | MVC area | File inspected | What it does |
 | --- | --- | --- |
-| Route | app/routes/web.php | <img width="1008" height="772" alt="image" src="https://github.com/user-attachments/assets/fda09b9b-9092-4881-9c06-200db7661eed" />
- |
-| Controller | app/app/Http/Controllers/TutoringRequestController.php | <img width="819" height="247" alt="image" src="https://github.com/user-attachments/assets/07767a11-4cad-4448-952c-4858b0f69def" />
- |
-| Model | app/app/Models/TutoringRequest.php | <img width="925" height="546" alt="image" src="https://github.com/user-attachments/assets/eb0de098-9519-42c3-92b0-af6c2350bdff" />
- |
-| View | app/resources/views/requests/create.blade.php | <img width="1063" height="760" alt="image" src="https://github.com/user-attachments/assets/2a135a5c-c4b5-48b4-a40c-6dc2dc8b53ec" />
- |
+| Route | app/routes/web.php | <img width="1008" height="772" alt="image" src="https://github.com/user-attachments/assets/fda09b9b-9092-4881-9c06-200db7661eed" />|
+| Controller | app/app/Http/Controllers/TutoringRequestController.php | <img width="819" height="247" alt="image" src="https://github.com/user-attachments/assets/07767a11-4cad-4448-952c-4858b0f69def" />|
+| Model | app/app/Models/TutoringRequest.php | <img width="925" height="546" alt="image" src="https://github.com/user-attachments/assets/eb0de098-9519-42c3-92b0-af6c2350bdff" />|
+| View | app/resources/views/requests/create.blade.php | <img width="1063" height="760" alt="image" src="https://github.com/user-attachments/assets/2a135a5c-c4b5-48b4-a40c-6dc2dc8b53ec" /> |
 
 
 ### 3. Reflection
