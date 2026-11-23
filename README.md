@@ -1,5 +1,20 @@
 # Try Out Development Containers: PHP
 
+## Air Asia Rewards Gift Card Website
+
+The HW3 PHP/SQLite project is in [air-asia/](air-asia/README.md).
+It includes the application, populated database, validation tests, test
+report and AI-use record. From this repository's Codespaces terminal:
+
+```bash
+cd air-asia
+php -S 0.0.0.0:8000 -t airasia-hw2
+```
+
+Open port 8000 and append `/card-list.php`. See the project README for
+setup, database access, and testing instructions.
+
+
 [![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/vscode-remote-try-php)
 
 A **development container** is a running [Docker](https://www.docker.com) container with a well-defined tool/runtime stack and its prerequisites. You can try out development containers with **[GitHub Codespaces](https://github.com/features/codespaces)** or **[Visual Studio Code Remote - Containers](https://aka.ms/vscode-remote/containers)**.
