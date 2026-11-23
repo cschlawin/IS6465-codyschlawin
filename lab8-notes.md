@@ -4,7 +4,7 @@
 
 **Repository used:** [Peer Tutoring Hub Laravel Demo](https://github.com/chinmaythorat92/peer-tutoring-laravel-demo)
 
-Confirm that you can view and use the main Peer Tutoring Hub workflow. 
+**Part 1: Run Application: Confirm that you can view and use the main Peer Tutoring Hub workflow. **
 <img width="1897" height="984" alt="image" src="https://github.com/user-attachments/assets/a5ff6fa0-4fd0-4541-9fec-47921850997a" />
 
 
