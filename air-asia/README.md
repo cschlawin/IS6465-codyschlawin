@@ -51,8 +51,8 @@ claimed by this coursework setup.
 
 | Role | Username | Test password |
 | --- | --- | --- |
-| Admin | bsmith | mysecret |
-| Customer | pjones | acrobat |
+| Admin | bsmith | refer to HW4 document |
+| Customer | pjones | refer to HW4 document |
 
 Both go to Gift Card List after login, as required by the original document.
 Only generated password hashes are stored in USER.password. These are
