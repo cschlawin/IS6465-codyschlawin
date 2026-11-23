@@ -1,6 +1,12 @@
 <?php
 // FR-09 / AT-06: pure validation only. No database include or writes.
 require_once __DIR__ . '/../includes/validation.php';
+if (PHP_SAPI !== 'cli') {
+  require_once __DIR__ . '/../includes/db.php';
+  require_once __DIR__ . '/../includes/authorization.php';
+  $user = requireLogin($pdo);
+  requireRole($user, ['Admin']);
+}
 $valid = [
   'cardName' => 'Amazon Gift Card',
   'cardType' => 'Retail',
@@ -59,7 +65,8 @@ require_once __DIR__ . '/../includes/nav.php';
 ?>
       <section class="panel form-panel">
         <h1>Validation Tests</h1>
-        <p>This harness does not connect to or modify the database.</p>
+        <p>These validation cases do not change database records.</p>
+        <p>Web access checks Admin authentication before running the cases.</p>
         <p><?= e($passedCount) ?>/<?= e(count($results)) ?> passed</p>
         <table class="test-table">
           <thead>

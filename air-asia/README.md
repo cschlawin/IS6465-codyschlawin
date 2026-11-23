@@ -1,278 +1,254 @@
-# Air Asia Rewards Gift Card Website
+# Air Asia Secure Access and Rewards Redemption
 
-## Location in the course repository
+IS 6465 HW4. The existing Air Asia application is extended in place in
+`cschlawin/IS6465-codyschlawin/air-asia/airasia-hw2/`. The original
+`cschlawin/air-asia` repository is not modified. The historical application
+folder name is retained; there is no duplicate HW4 application or Laravel.
 
-This project is now at `cschlawin/IS6465-codyschlawin/air-asia/`.
-The original repository and its history remain at
-https://github.com/cschlawin/air-asia . This is a copy of the committed
-project state, not a transfer of its Git history or Codespaces session.
+## Start in GitHub Codespaces
 
-In a Codespace opened from **IS6465-codyschlawin**, start here:
+From the course repository root:
 
 ```bash
-cd /workspaces/IS6465-codyschlawin/air-asia
-php -S 0.0.0.0:8000 -t airasia-hw2
+git pull --ff-only
+cd air-asia
+php -v
+php -r 'var_export(PDO::getAvailableDrivers());'
+php airasia-hw2/database/setup.php
+php -S 0.0.0.0:8000 -t airasia-hw2 airasia-hw2/server.php
 ```
 
-Open forwarded port 8000 and append `/card-list.php`. If another lab is
-using port 8000, stop that development server or choose an available port.
-All relative setup/test commands below run from this Air Asia project
-folder, unless a different current folder is explicitly stated.
+Open forwarded port **8000** (Private) and `/login.php`. `/` also redirects
+to Login. Stop any other lab server using 8000 first, or choose another
+available port. The original Codespace URL does not transfer to this repo.
 
+**PHP version:** PHP 8 with PDO SQLite is required. The course Codespaces
+configuration now selects its existing image's documented `8-bullseye`
+variant instead of PHP 7. In an already-running PHP 7 Codespace, commit
+local work and use **Codespaces: Rebuild Container**, then check `php -v`.
+If PHP 8 is present but SQLite support/client is missing, install the
+matching extension/client for your environment. Debian/Ubuntu system PHP:
 
-IS 6465 HW3: PHP 8, SQLite, PDO, HTML and the existing Air Asia CSS.
-The original application remains in **airasia-hw2/**; its name is retained
-so existing links and Codespaces commands continue to work. There is one
-application root and one database.
+```bash
+sudo apt-get update
+sudo apt-get install -y php-sqlite3 sqlite3
+```
 
-## Quick database access
+The devcontainer's `/usr/local/bin/php` build may instead need its bundled
+`docker-php-ext-install pdo_sqlite` command; use `PDO::getAvailableDrivers()`
+to verify the actual PHP executable. Do not add MySQL credentials.
 
-Run these commands in the **Codespaces terminal**, starting in the
-Air Asia project folder (`/workspaces/IS6465-codyschlawin/air-asia`):
+**Use the complete server command above.** `server.php` is the small
+built-in-server file-access guard used for the same purpose as the lab's
+`php/router.php`; it is not a framework router or MVC refactor. It leaves
+ordinary PHP page filenames as request handlers while blocking downloads
+of database/SQL files and access to helpers, services and repositories.
+Running an unguarded server at the course repository root exposes files
+that are not public application pages. No production server deployment is
+claimed by this coursework setup.
+
+## Required grading accounts
+
+| Role | Username | Test password |
+| --- | --- | --- |
+| Admin | bsmith | mysecret |
+| Customer | pjones | acrobat |
+
+Both go to Gift Card List after login, as required by the original document.
+Only generated password hashes are stored in USER.password. These are
+intentional coursework credentials; do not reuse personal passwords.
+
+## Database access and migration
+
+From `/workspaces/IS6465-codyschlawin/air-asia`:
 
 ```bash
 cd airasia-hw2/database
 sqlite3 rewards.db
 ```
 
-At the `sqlite>` prompt, inspect the database:
+At `sqlite>`:
 
 ```sql
 .tables
-.schema GIFTCARD
+.schema USER
+.schema ACCOUNT
+.schema REDEMPTION
 .headers on
 .mode column
-SELECT * FROM GIFTCARD LIMIT 5;
-SELECT COUNT(*) AS account_count FROM ACCOUNT;
-SELECT COUNT(*) AS gift_card_count FROM GIFTCARD;
+SELECT userId, userName, firstName, lastName, role FROM USER;
+SELECT accountId, userId, accountType, points FROM ACCOUNT;
+SELECT COUNT(*) AS gift_cards FROM GIFTCARD;
+SELECT COUNT(*) AS redemptions FROM REDEMPTION;
 .quit
 ```
 
-`.tables` should list `ACCOUNT` and `GIFTCARD`. The supplied seed database
-contains five accounts and 20 gift cards; counts can change after CRUD tests.
-Commands beginning with a dot are SQLite commands, not Bash commands.
+Use the singular table name `GIFTCARD`, not `GIFTCARDS`. Commands starting
+with a dot run inside SQLite. `sqlite3 rewards.db < schema.sql` is a Bash
+command and its short paths only work in the database directory.
 
-After `.quit`, you are back in Bash in the database folder. To initialize
-the tables or deliberately rerun the sample seed data from that folder:
+For an existing HW3 database, use **`php airasia-hw2/database/setup.php` from
+the Air Asia project folder**, not just the old schema import. The CLI-only
+script creates USER and REDEMPTION, links the five existing account owners,
+and rebuilds the old ACCOUNT table only when its USER foreign key is
+missing. Schema, seed and migration run in one transaction, with a foreign
+key check before commit. A failure rolls the operation back. Existing
+card/account records, IDs, values and balances are retained; the committed
+database has **21 GIFTCARD, five ACCOUNT, five USER, and zero REDEMPTION**
+records before users perform redemption. All old cards, including SchlaGift,
+and the saved Amazon values are preserved.
 
-```bash
-sqlite3 rewards.db < schema.sql
-sqlite3 rewards.db < seed.sql
-```
+Routine setup reruns use fixed seed IDs with `ON CONFLICT(userId/cardId/
+accountId) DO NOTHING`; they do not duplicate rows, reset passwords or
+balances, or replace edited cards. Deliberate reseeding can reintroduce a
+deleted seed ID. Back up useful local changes before schema work. If custom
+old accounts reference users outside the fixtures, setup fails rather than
+inventing identities or silently losing records.
 
-The committed database is already initialized; these setup commands are
-optional. Rerunning the seed preserves existing IDs but can restore deleted
-sample records. Use `sqlite3` only once per command. Bash resolves
-`< schema.sql` relative to your current folder, so running that short
-command from the Air Asia project folder causes “schema.sql: No such file or
-directory.”
+`schema.sql` has exactly USER(userId, userName, password, firstName,
+lastName, role), ACCOUNT(accountId, userId, accountType, points),
+GIFTCARD(cardId, cardName, cardType, cardValue, points), and
+REDEMPTION(redeemId, date, accountId, cardId, pointsRedeemed).
+ACCOUNT references USER; REDEMPTION references ACCOUNT and GIFTCARD.
+Deleting a card with redemption history is blocked by referential integrity
+and gives a helpful message. An unredeemed card can still be deleted.
 
-To return to the Air Asia project folder after using the database folder:
+## Permissions and source precedence
 
-```bash
-cd ../..
-```
+The original AirAsia Requirements Document governs names, relationships,
+roles and business rules. HW4 governs the added secure workflows. The two
+Week 9 sources guide the page/service/repository separation, not adoption
+of Laravel, controller classes or a new application router.
 
-Alternatively, open the database directly **from the Air Asia project folder**
-without changing folders:
+| Function | Admin | Customer |
+| --- | --- | --- |
+| View gift-card list/details | Yes | Yes |
+| Add/update/delete gift cards | Yes | No |
+| Add a customer plus linked account | Yes | No |
+| View customer-profile.php | No | Own profile/accounts only |
+| Redeem gift cards | Own account(s) | Own account(s) |
+| Browser validation/integration harnesses | Yes | No |
 
-```bash
-sqlite3 airasia-hw2/database/rewards.db
-```
+**Permission reconciliation:** the generic HW4 example/rubric describes a
+Customer redemption flow, but expressly defers to the original document.
+Original use case 8, Redeem gift cards, lists **Customer and Admin**. Both
+roles therefore may redeem, but neither may choose someone else's account
+or receipt. Tests cover Admin redemption as well as the required Customer
+success/insufficient-points flows. No user/role or account ID from a URL or
+form is trusted as the current identity.
 
-## Scope
+## Architecture and code style
 
-Gift-card list, selected details, add, update and confirmed delete are
-implemented. ACCOUNT is seeded for HW4 only. Login, sessions, authorization,
-customer administration and redemption remain out of scope. The original
-login.php is preserved unchanged; start HW3 at card-list.php. No page in the
-HW3 workflow depends on login. There is no JavaScript or front-end framework.
+Following Labs 1-7: PHP pages handle GET/POST, call functions and choose a
+view/redirect; shared includes render the header/nav/footer; services apply
+validation/business rules and transactions; `repositories/*PDO.php` holds
+prepared SQL; includes/db.php opens SQLite with foreign keys enabled.
+The existing Air Asia HTML/CSS, image and page paths are reused. Existing
+snake_case validation names are retained for compatibility; new procedural
+helpers use the Lab 7-style names requireLogin, requireRole, csrfToken,
+verifyCsrfToken, authenticate and repository/service functions. The labs'
+source files and original Air Asia repository remain unchanged.
 
-## Requirements used
+| Location | Responsibility |
+| --- | --- |
+| login.php / authenticate.php | POST credentials, safe failure message, verify hash, regenerate session ID, redirect |
+| logout.php | POST + CSRF, clear values/cookie, destroy session, redirect |
+| includes/auth.php / authorization.php | Separate session name, cookie flags, current-user refresh, login/role/CSRF checks |
+| Existing card-*.php | Authenticated reads; Admin-only writes with CSRF and existing validation |
+| cust-add.php | Admin-only form and confirmation, without echoing passwords |
+| customer-profile.php | Read-only current Customer plus all their linked account points |
+| redeem.php / process-redemption.php | Select/confirm an owned account; atomic redemption; owned receipt |
+| services/ | Gift-card validation, customer+account creation, authentication and redemption workflows |
+| repositories/ | Prepared USER, ACCOUNT, GIFTCARD and REDEMPTION queries |
+| database/setup.php | CLI-only transactional migration and nonduplicating fixture setup |
+| server.php | Development file guard; public endpoints/assets only |
+| tests/ | Pure validation and isolated in-memory service integration tests |
 
-- Original AirAsia requirements: exact ACCOUNT/GIFTCARD columns and types.
-- AirAsia_HW3_Instructions.docx: HW3 behavior, deliverables and testing.
-- Attached AirAsia_HW3_SAD_Requirements_and_Business_Rules.docx: FR, BR, DR,
-  UC and acceptance-test traceability (populated HW3 specification).
-- Existing wireframes and pages: visual layout; they do not expand scope.
+## Validation and security decisions
 
-The HW3 instructions override the old update/delete flow: updates return to
-selected details; deletion requires a confirmation screen and affirmative
-POST. ACCOUNT.userId is required but has no foreign key to a deferred USER
-table. No USER/REDEMPTION tables or image columns were added.
-
-## Files
-
-```text
-air-asia/
-  README.md
-  test-report.md
-  ai-use.txt                 # Preserved HW2 history plus HW3 disclosure
-  .vscode/settings.json      # Existing editor wrap/indent preferences
-  airasia-hw2/               # Existing application, now implementing HW3
-    login.php                # Unchanged HW2 prototype; not an HW3 entry point
-    card-list.php
-    card-details.php
-    card-add.php
-    card-update.php
-    card-delete.php
-    includes/
-      header.php
-      nav.php
-      footer.php
-      db.php
-      validation.php
-    database/
-      schema.sql
-      seed.sql
-      rewards.db
-    tests/
-      validation-tests.php
-    css/styles.css
-    images/gift-card.png
-```
-
-## Run in GitHub Codespaces
-
-1. Open this repository, select **Code > Codespaces**, and create/open a
-   Codespace on main. In an existing Codespace run `git pull --ff-only`
-   first; commit your own local edits before pulling if needed.
-2. From the Air Asia project folder, check the tools:
-
-   ```bash
-   php -v
-   php -r 'var_export(PDO::getAvailableDrivers());'
-   sqlite3 --version
-   ```
-
-   PHP must be version 8 or newer, and the PDO output must include `sqlite`.
-   If these tools are missing in the standard Debian/Ubuntu Codespace:
-
-   ```bash
-   sudo apt-get update
-   sudo apt-get install -y php-cli php-sqlite3 sqlite3
-   ```
-
-3. The committed database already contains 21 gift cards and five accounts.
-   To create it if missing, or safely rerun setup:
-
-   ```bash
-   sqlite3 airasia-hw2/database/rewards.db < airasia-hw2/database/schema.sql
-   sqlite3 airasia-hw2/database/rewards.db < airasia-hw2/database/seed.sql
-   sqlite3 airasia-hw2/database/rewards.db 'SELECT count(*) FROM GIFTCARD;'
-   sqlite3 airasia-hw2/database/rewards.db 'SELECT count(*) FROM ACCOUNT;'
-   ```
-
-   `CREATE TABLE IF NOT EXISTS` preserves tables. Seed inserts use fixed
-   IDs with `ON CONFLICT(primaryKey) DO NOTHING`; reruns do not duplicate or
-   overwrite existing rows. Deliberately rerunning the seed will restore a
-   deleted seed ID if it is still vacant. These are demonstration records,
-   not real customers or official rewards pricing. The application does
-   not seed automatically when a page is opened. Back up useful data before
-   any intentional reset; setup does not drop tables or delete records.
-
-4. Start the development server from the Air Asia project folder:
-
-   ```bash
-   php -S 0.0.0.0:8000 -t airasia-hw2
-   ```
-
-5. Open port **8000** in the Codespaces **Ports** tab, keep visibility
-   **Private**, and append `/card-list.php` to the forwarded URL. The test
-   harness is `/tests/validation-tests.php`. There is no index page; a
-   request for `/` alone is not the HW3 entry point.
-
-Stop the server with Ctrl+C. PHP's server is for development. GitHub Pages
-cannot run this PHP/SQLite application. The directory containing rewards.db
-must be writable by PHP so SQLite can create its transaction journal.
-
-## Validation and data decisions
-
-- Existing card types are **Retail, Dining, Entertainment, Travel**. This is
-  a documented application choice, not an original-source enumeration.
-  `CARD_TYPES` in includes/validation.php drives both forms and validation;
-  seed rows and the harness use the same list.
-- Names are trimmed, required and limited to 100 Unicode characters. Types
-  are required and allowed. Values must be finite and greater than zero.
-  The numeric form uses `step="any"` because the business rule does not
-  require two decimal places; currency display uses two decimal places.
-- Points and IDs use positive decimal integers within PHP's integer range.
-  Fractions, signs, exponent notation, arrays and overflowing integers are
-  rejected. IDs must exist before reading, updating or deleting a card.
-- cardId is database-generated. Add has no ID input; Update shows the ID as
-  read-only text. A validated query-string ID identifies the selected record.
-- Database/form output uses htmlspecialchars through `e()`. SQL receiving
-  input uses prepared statements with bound parameters. Invalid forms get
-  helpful field errors and retain safe text/number entries; invalid types
-  are not added to the allowed dropdown list.
-- Changes use POST and successful writes use a 303 redirect. Invalid input
-  gets 422, malformed IDs get 400, nonexistent cards get 404, and database
-  failures show a friendly 503 without raw SQL errors in the page.
-- Every card uses the existing local gift-card image as a generic fallback;
-  no database image field is required. Shared includes retain the existing
-  Air Asia styling and offer List and Add navigation without HW4 controls.
+- Password verification uses password_verify(); new customer passwords are
+  hashed by password_hash() in userService.php. The unchanged database
+  attribute name is `password`, not an invented `password_hash` column.
+- Successful login calls session_regenerate_id(true), clears old session
+  data, and stores userId/userName/role plus CSRF/one-use form state. An
+  anonymous session exists for the login CSRF token, as in Lab 7; no logged-in
+  identity is created until credentials verify. Passwords/hashes are never
+  placed in the session or redisplayed after customer submission.
+- Cookies are HttpOnly and SameSite=Lax, with Secure on HTTPS. The app uses
+  its own session name to avoid conflicting with the other course labs.
+  Identity/role are re-read from USER on protected requests. Logout is POST.
+- Every changing form, including login/logout and CRUD, validates a CSRF
+  token on the server. Cached protected output is disabled. Direct URLs
+  enforce login and roles before showing protected content.
+- Customer creation trims/validates required names and account type to 100
+  characters; usernames are unique case-insensitively. Role is always
+  Customer regardless of posted data. New passwords are 8-72 bytes to match
+  the bcrypt limit; the required seeded seven-character `acrobat` still
+  verifies because login does not apply registration's minimum length.
+  Starting points are a nonnegative integer set only by the Admin.
+- Existing Retail/Dining/Entertainment/Travel card-type choices remain the
+  documented allowlist. Card values are positive finite numbers and points
+  are positive whole numbers. Card IDs are generated, never editable.
+- A redemption retrieves the current card and own ACCOUNT from SQLite,
+  checks sufficient points and conditionally updates that balance, inserts
+  REDEMPTION and commits both. Any failure rolls back. Posted costs/points
+  or user IDs cannot override the database/session. A one-use confirmation
+  prevents refresh/replay; a changed points cost requires reviewing a new
+  confirmation. GET never deducts points. Dates are stored in UTC.
+- Customer profile uses only the session identity. Receipt and account
+  queries enforce ownership. Multiple owned accounts can be selected;
+  accounts belonging to other users are rejected even if a form is altered.
+- Prepared statements bind all supplied values. Displayed data uses the
+  existing htmlspecialchars helper. Errors do not expose raw SQL or hashes.
 
 ## Use Case Traceability
 
-Paths below are relative to airasia-hw2/. All five use cases operate on
-GIFTCARD; ACCOUNT has no interface in HW3.
+All page paths below are relative to `airasia-hw2/`. HW3 use cases remain
+implemented; their writes now require Admin login and CSRF.
 
-| Use case | SAD | PHP page(s) | Database table | Test evidence |
-| --- | --- | --- | --- | --- |
-| View a List of Gift Cards | UC-01 / FR-01 | card-list.php | GIFTCARD | T02 rendered 20 saved cards and checked local assets and selected detail links through PHP CGI. |
-| View Details of One Gift Card | UC-02 / FR-02 | card-details.php | GIFTCARD | T03 rendered all 20 seeded IDs and verified selected attributes and links; T08 rejected invalid/unknown IDs. |
-| Add a Gift Card | UC-03 / FR-03 | card-add.php | GIFTCARD | T04 submitted valid POST data, checked the inserted row and list redirect; T07 rejected altered input. |
-| Update a Gift Card | UC-04 / FR-04 | card-update.php, card-details.php | GIFTCARD | T05 verified prefill, updated four values and checked the selected details redirect and saved record. |
-| Delete a Gift Card | UC-05 / FR-05 | card-delete.php, card-list.php | GIFTCARD | T06 proved GET/Cancel do not delete, rejected unconfirmed POST, and verified affirmative POST deletes only the selected record. |
+| Requirements use case | Page(s) | Tables | Verification |
+| --- | --- | --- | --- |
+| View a list of gift cards | card-list.php | GIFTCARD | Authenticated CGI List returns 21 saved cards; Customer/Admin navigation checked. |
+| View details of one gift card | card-details.php | GIFTCARD | Authenticated selected details, IDs, role-specific links and CGI regression. |
+| Add data for a new gift card | card-add.php | GIFTCARD | Admin valid POST inserts; Customer direct URL denied; invalid/CSRF requests rejected. |
+| Update data for one gift card | card-update.php, card-details.php | GIFTCARD | Admin changes persist and redirect to selected details; Customer denied. |
+| Delete a card | card-delete.php | GIFTCARD, REDEMPTION relationship | POST-confirmed deletion, GET/Cancel/no-confirm safety and redeemed-card FK tested. |
+| Login | login.php, authenticate.php | USER | T09-T11 required credentials, failed login, regenerated session ID. |
+| Log out of the system (HW4) | logout.php | Session | POST logout invalidates current/old session; protected request redirects. |
+| Add a customer | cust-add.php | USER, ACCOUNT | T14 hashed password, forced Customer role, linked account and duplicate handling. |
+| View customer profile and points (HW4) | customer-profile.php | USER, ACCOUNT | Customer sees own information despite altered URL IDs; Admin denied. |
+| Redeem gift cards | redeem.php, process-redemption.php | GIFTCARD, ACCOUNT, REDEMPTION | T15-T16 success/insufficient/ownership/replay and forced rollback checks. |
 
-## Tests and verification status
+## Tests and actual verification status
 
 From the Air Asia project folder:
 
 ```bash
 php airasia-hw2/tests/validation-tests.php
+php airasia-hw2/tests/integration-tests.php
 find airasia-hw2 -name '*.php' -exec php -l {} \;
 ```
 
-The validation harness also displays PASS/FAIL in the browser and never
-connects to the database. It currently covers 29 cases. See **test-report.md**
-for T01-T08 inputs, expected and actual results, limitations, and manual
-Codespaces steps. Automated PHP 8.4.27 CLI/CGI and SQLite tests passed in the
-assistant's Linux workspace on November 12, 2026 using an isolated copy.
-The committed database retains 21 gift cards and five accounts.
+- Validation: **29/29 passed**, pure checks with no database mutation.
+- Integration: **22/22 passed**, authentication/customer/redemption checks
+  against `sqlite::memory:`, including forced rollback failures.
+- PHP CGI requests: required logins, all protected endpoints, direct-URL
+  roles, existing CRUD regression, profile/receipt ownership, CSRF, customer
+  creation, redemption success/failure/replay and logout passed using an
+  isolated application/database/session copy. These are actual PHP requests
+  and generated responses, not browser screenshots.
+- Migration: twice-run setup preserved all 21 card rows and five account
+  rows/values, with no foreign-key violations; no test purchase or extra
+  customer was left in the committed database.
 
-**Student-reported Codespaces check (November 12, 2026):** Cody confirmed
-that the website launched, active pages could be used, and a new gift card
-could be added, updated and deleted. This confirms the basic manual CRUD
-workflow; the assistant did not observe that browser session.
+See test-report.md for T09-T16 steps, expected and actual outcomes, additional
+checks and prior HW3 evidence. **A new HW4 Codespaces/browser session has not
+been run by the assistant.** Rebuild/check PHP 8 as needed, then manually test
+both grading accounts, direct URL denial, Add Customer, own Profile, one
+successful and one insufficient-points redemption, logout and mobile layout.
+The earlier HW3 screenshots do not certify the new HW4 flows.
 
-**Student-provided SQLite evidence:** the Codespaces database contains
-21 gift cards and five accounts, including the newly added SchlaGift card.
-The output also shows Amazon Gift Card saved with value 30.0 and 3000 points.
-The 21-card count meets the minimum of 20; the added card may remain.
-The relocation check on November 23, 2026 confirmed the committed source
-database also contains 21 gift cards and five accounts. Its bytes are
-preserved in this course-repository copy.
-
-**Additional browser checks completed:** the student's screenshot shows
-29/29 harness checks passing. Screenshots show the expected errors for
-card_id=abc and card_id=999999; the student confirmed both return links.
-Delete Cancel left SchlaGift present. Blank required input and negative
-points were blocked by browser messages. The student also confirmed pages
-were visible at a narrowed mobile width without reporting layout problems.
-See test-report.md for the evidence and scope of these checks.
-
-Browser-required/minimum messages test native HTML validation; independent
-PHP CLI/CGI tests cover server-side rejection and safe input retention.
-The assistant did not directly control the private Codespaces browser.
-Exact device widths, every card's browser details and every crafted POST
-case were not individually repeated in the student's manual session.
-
-## Instructor review and submission
-
-The source, populated database, tests and documentation are in this
-repository. Read ai-use.txt for preserved prompts/history and the HW3 AI
-contribution record. Review and understand the code and the recorded results in test-report.md.
-Commit/push any local database changes before submitting the repository
-link in Canvas. No Canvas submission has been
-performed by the assistant.
+Before submitting, commit/push any local data changes and submit the course
+repository's Air Asia folder link in Canvas. No Canvas submission or
+instructor approval is claimed. ai-use.txt retains the earlier history and
+records this HW4 work and its verification limits.

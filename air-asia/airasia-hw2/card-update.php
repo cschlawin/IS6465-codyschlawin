@@ -1,6 +1,10 @@
 <?php
 // UC-04 / FR-04: validated POST update, then selected details (HW3 flow).
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/authorization.php';
+require_once __DIR__ . '/services/cardService.php';
+$user = requireLogin($pdo);
+requireRole($user, ['Admin']);
 $cardId = positive_integer($_GET['card_id'] ?? null);
 if ($cardId === null) {
   show_error('Choose a gift card using a valid positive integer card ID.');
@@ -24,22 +28,14 @@ foreach (['cardName', 'cardType', 'cardValue', 'points'] as $field) {
 $errors = [];
 $formError = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  verifyCsrfToken($_POST);
   $result = validate_card($_POST);
   $values = $result['values'];
   $errors = $result['errors'];
   if ($errors === []) {
     try {
-      $statement = $pdo->prepare(
-        'UPDATE GIFTCARD SET cardName = :cardName, cardType = :cardType, '
-        . 'cardValue = :cardValue, points = :points WHERE cardId = :cardId'
-      );
-      $statement->bindValue(':cardName', $values['cardName']);
-      $statement->bindValue(':cardType', $values['cardType']);
-      $statement->bindValue(':cardValue', $values['cardValue']);
-      $statement->bindValue(':points', (int) $values['points'], PDO::PARAM_INT);
-      $statement->bindValue(':cardId', $cardId, PDO::PARAM_INT);
-      $statement->execute();
-      if ($statement->rowCount() === 0) {
+      $updated = reviseGiftCard($pdo, $cardId, $_POST);
+      if (!$updated) {
         show_error('This gift card is no longer available.', 404);
       }
       header('Location: card-details.php?card_id=' . $cardId, true, 303);
@@ -78,6 +74,7 @@ require_once __DIR__ . '/includes/nav.php';
           <?php endif; ?>
           <form method="post"
             action="card-update.php?card_id=<?= e($cardId) ?>">
+            <?= csrfField() ?>
             <div class="field">
               <label for="card-name">
                 Card Name <span aria-hidden="true">*</span>

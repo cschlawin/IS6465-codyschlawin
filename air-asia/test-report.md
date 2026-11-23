@@ -1,3 +1,133 @@
+# HW4 Test Report
+
+Date: November 23, 2026. Automated tester: OpenAI ChatGPT / Codex.
+Environment: PHP 8.4.27 CLI/CGI, PDO SQLite, isolated database/session copy.
+No new HW4 Codespaces/browser execution is claimed. Historical HW3 student
+browser tests below remain historical and are not reused as HW4 passes.
+
+## Required HW4 cases
+
+### T09
+
+- **Steps/input:** GET Login, POST bsmith/mysecret with CSRF, inspect session cookie/values and List; retry pre-login session ID.
+- **Expected:** Admin signs in; ID rotates; old ID cannot access protected content.
+- **Actual:** bsmith/mysecret signs in; session ID rotates, old ID cannot access protected content; Admin navigation visible and session contains no password/hash.
+- **Status:** PASS (automated PHP CGI, not an observed browser session).
+
+### T10
+
+- **Steps/input:** POST pjones/acrobat; open List, Details and Profile; alter userId/accountId query values.
+- **Expected:** Customer signs in, sees only own account/profile and no Admin controls.
+- **Actual:** pjones/acrobat signs in; Customer navigation omits Admin actions; details permit redemption; altered profile identifiers still show only pjones account/points.
+- **Status:** PASS (automated PHP CGI, not an observed browser session).
+
+### T11
+
+- **Steps/input:** Try incorrect password, unknown/SQL-like usernames and missing CSRF.
+- **Expected:** Safe general failure, no identity, no SQL errors; missing CSRF denied.
+- **Actual:** Wrong password, unknown username and SQL-like username fail with the same safe message; no identity created; missing login CSRF rejected.
+- **Status:** PASS (automated PHP CGI, not an observed browser session).
+
+### T12
+
+- **Steps/input:** Request all 12 protected page endpoints without identity, including nested course-folder paths.
+- **Expected:** Redirect to Login and stop protected output.
+- **Actual:** All 12 protected page endpoints redirect anonymous requests without content; nested course-folder redirect also correct.
+- **Status:** PASS (automated PHP CGI, not an observed browser session).
+
+### T13
+
+- **Steps/input:** Customer directly GET/POST Add/Update/Delete cards, Add Customer and browser harnesses; Admin opens Customer profile.
+- **Expected:** 403 on disallowed role paths; no changed records.
+- **Actual:** Customer direct GET and POST to four Admin pages and two test harnesses return 403 with no changes. Admin customer-profile access is denied.
+- **Status:** PASS (automated PHP CGI, not an observed browser session).
+
+### T14
+
+- **Steps/input:** Admin POST new-hw4/NewPass123!, first/last name, Rewards and 5000 points; post role=Admin; try duplicate and negative opening points.
+- **Expected:** One Customer plus linked account; hashed password; no escalation or duplicate/invalid writes; new login works.
+- **Actual:** Admin created Customer plus account atomically; submitted Admin role ignored, password hashed/not echoed, new customer login works, duplicate and invalid input create nothing.
+- **Status:** PASS (automated PHP CGI, not an observed browser session).
+
+### T15
+
+- **Steps/input:** Customer confirms card 1 using own account 2; tamper posted cost/user, replay POST and access receipt as another user. Also test Admin own-account redemption per original use case 8.
+- **Expected:** One redemption and matching database-priced deduction; owned receipt; replay/cross-user requests blocked.
+- **Actual:** Customer redemption inserted one record and deducted database cost from own account; receipt shows new balance; posted price/user ignored, replay rejected, foreign receipt hidden. Original-spec Admin redemption also passed using own account.
+- **Status:** PASS (automated PHP CGI, not an observed browser session).
+
+### T16
+
+- **Steps/input:** On the isolated test database, set Customer account balance to zero and confirm a card. Try another user account ID.
+- **Expected:** Helpful rejection; no redemption or points change.
+- **Actual:** Insufficient points leaves all rows/balances unchanged; forged other-user account selection also rejected without writes.
+- **Status:** PASS (automated PHP CGI, not an observed browser session).
+
+## Regression and additional checks
+
+- **Price change — PASS:** when the card points cost changed after the
+  confirmation form was shown, submission was rejected and no balance or
+  redemption changed. The user must review the changed card again.
+
+- **T02-T08 regression — PASS:** Authenticated List/Details/Add/Update/Delete, GET/cancel/no-confirm safety, selected-details redirect, invalid IDs/points and CSRF rejection passed; final card count 21.
+- **T01/integration — PASS:** Browser-style CGI outputs show 29/29 validation and 22/22 service checks; neither harness changed the test application database.
+- **Logout — PASS:** GET does not log out; POST with CSRF clears/destroys the session; both no-cookie and old-cookie protected access redirect to Login.
+- **Serving guard — PASS:** Development file guard rejects database, seed, setup, helper/service/repository paths, including encoded database path.
+
+- All 30 PHP files passed syntax checks at the final verification stage.
+- The CLI validation harness passed 29/29; service harness passed 22/22.
+  Database byte comparisons confirmed the web harnesses did not alter the
+  application database; service writes were only in memory.
+- The service harness deliberately aborted REDEMPTION insertion after a
+  points update. The exception propagated and rollback restored the exact
+  prior balance/count. A forced ACCOUNT insert failure also rolled back
+  its new USER record. No partial transaction was left behind.
+- Twice-run migration preserved every original GIFTCARD and ACCOUNT value;
+  foreign_key_check returned no violations. Published fixture state is
+  21 GIFTCARD, five ACCOUNT, five USER, zero REDEMPTION.
+
+## Defects and decisions reviewed during development
+
+- The course devcontainer still selected PHP 7, although Air Asia requires
+  PHP 8. Changed its existing VARIANT setting to 8-bullseye; no Lab source
+  was changed. Container rebuilding itself was not performed here.
+- Corrected the session cookie path during development so an application
+  served at / uses / rather than //. CGI login/logout tests passed afterward.
+- Added CSRF/role checks before existing CRUD processing so hidden links
+  cannot substitute for authorization. Direct GET/POST denial passed.
+- Original requirements permit Admin and Customer redemption; the general
+  HW4 example limits it to Customer but defers to the original. Kept both
+  roles for own-account redemption and tested both. Customer Profile remains
+  Customer-only. This reconciliation is documented rather than hidden.
+- Preserved the USER.password name/100-character attribute and used hashes,
+  rather than copying Lab 7's unrelated users/password_hash schema.
+- Adopted the lab's file-serving protection purpose without Laravel, an
+  MVC router/controller-class refactor, or a replacement application root.
+
+## Manual HW4 Codespaces checklist — not yet run
+
+1. Pull main, verify PHP 8/PDO SQLite, rebuild the container if necessary,
+   run database/setup.php and launch with the guarded command in README.
+2. Log in as bsmith/mysecret. Confirm Admin List/Add/Customer links, existing
+   CRUD and customer creation, then log out using the navigation button.
+3. Log in as pjones/acrobat. Confirm no Admin controls; paste card-add.php
+   and cust-add.php directly and confirm access denied. Check My Profile.
+4. Open Profile with another user's/account's ID in the URL and confirm
+   it remains your own. Choose a card, confirm redemption, and check the
+   receipt/current balance plus a new REDEMPTION row in SQLite.
+5. Test insufficient points using a deliberately prepared test account/card,
+   record the exact initial balance/cost and confirm neither table changes.
+   Do not spend or alter useful demonstration data without tracking it.
+6. Log out; reopen a protected URL and confirm Login. Check desktop/mobile
+   layout and both Admin-only browser harnesses. Record actual outcomes here
+   before claiming a manual PASS or submitting in Canvas.
+
+## Historical HW3 baseline and student-reported evidence
+
+The following record is preserved from HW3. Any statements about unprotected
+pages, original file paths, old test dates, previous publication status, or
+pending HW3 steps apply to that earlier baseline, not the current HW4 app.
+
 # HW3 Test Report
 
 ## Relocation verification November 23 2026

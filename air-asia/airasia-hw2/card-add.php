@@ -1,6 +1,10 @@
 <?php
 // UC-03 / FR-03: validate on the server before inserting via PDO.
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/authorization.php';
+require_once __DIR__ . '/services/cardService.php';
+$user = requireLogin($pdo);
+requireRole($user, ['Admin']);
 if ($dbError !== null) {
   show_error($dbError, 503);
 }
@@ -10,20 +14,13 @@ $values = [
 $errors = [];
 $formError = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  verifyCsrfToken($_POST);
   $result = validate_card($_POST);
   $values = $result['values'];
   $errors = $result['errors'];
   if ($errors === []) {
     try {
-      $statement = $pdo->prepare(
-        'INSERT INTO GIFTCARD (cardName, cardType, cardValue, points) '
-        . 'VALUES (:cardName, :cardType, :cardValue, :points)'
-      );
-      $statement->bindValue(':cardName', $values['cardName']);
-      $statement->bindValue(':cardType', $values['cardType']);
-      $statement->bindValue(':cardValue', $values['cardValue']);
-      $statement->bindValue(':points', (int) $values['points'], PDO::PARAM_INT);
-      $statement->execute();
+      addGiftCard($pdo, $_POST);
       header('Location: card-list.php', true, 303);
       exit;
     } catch (PDOException $exception) {
@@ -58,6 +55,7 @@ require_once __DIR__ . '/includes/nav.php';
             </p>
           <?php endif; ?>
           <form action="card-add.php" method="post">
+            <?= csrfField() ?>
             <div class="field">
               <label for="card-name">
                 Card Name <span aria-hidden="true">*</span>

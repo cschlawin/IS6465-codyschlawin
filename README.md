@@ -2,16 +2,16 @@
 
 ## Air Asia Rewards Gift Card Website
 
-The HW3 PHP/SQLite project is in [air-asia/](air-asia/README.md).
+The HW4 secure PHP/SQLite project is in [air-asia/](air-asia/README.md).
 It includes the application, populated database, validation tests, test
 report and AI-use record. From this repository's Codespaces terminal:
 
 ```bash
 cd air-asia
-php -S 0.0.0.0:8000 -t airasia-hw2
+php -S 0.0.0.0:8000 -t airasia-hw2 airasia-hw2/server.php
 ```
 
-Open port 8000 and append `/card-list.php`. See the project README for
+Open port 8000 and append `/login.php`. See the project README for
 setup, database access, and testing instructions.
 
 

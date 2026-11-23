@@ -594,3 +594,23 @@ dd.points {
     font-size: 22px;
   }
 }
+
+/* HW4: role-aware navigation and the existing Air Asia form layout. */
+nav { flex-wrap: wrap; align-items: center; }
+nav form { margin: 0; }
+.nav-button {
+  border: 0;
+  background: transparent;
+  color: var(--red);
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+.nav-button:hover { text-decoration: underline; }
+.success-message {
+  color: #176335;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+nav .nav-label { max-width: 180px; overflow-wrap: anywhere; }
+.redemption-image { width: min(100%, 320px); border-radius: 12px; }

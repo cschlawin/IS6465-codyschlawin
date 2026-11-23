@@ -1,6 +1,8 @@
 <?php
 // UC-02 / FR-02, BR-05: selected record, read-only attributes, safe IDs.
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/authorization.php';
+$user = requireLogin($pdo);
 $cardId = positive_integer($_GET['card_id'] ?? null);
 if ($cardId === null) {
   show_error('Choose a gift card using a valid positive integer card ID.');
@@ -47,6 +49,7 @@ require_once __DIR__ . '/includes/nav.php';
             </div>
           </dl>
           <div class="form-actions">
+            <?php if ($user['role'] === 'Admin'): ?>
             <a class="button"
               href="card-update.php?card_id=<?= e($cardId) ?>">
               Update Gift Card
@@ -54,6 +57,10 @@ require_once __DIR__ . '/includes/nav.php';
             <a class="button secondary"
               href="card-delete.php?card_id=<?= e($cardId) ?>">
               Delete Gift Card
+            </a>
+            <?php endif; ?>
+            <a class="button" href="redeem.php?card_id=<?= e($cardId) ?>">
+              Redeem Gift Card
             </a>
           </div>
           <a class="back-link return-link" href="card-list.php">

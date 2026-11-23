@@ -352,3 +352,70 @@ Preserved application code, assets and SQLite database bytes. Verified
 source database integrity and counts of 21 gift cards and five accounts.
 This is a file snapshot copy, not a Git history merge or Codespaces move.
 No new runtime/browser test at the destination is claimed.
+
+
+HW4 IMPLEMENTATION - NOVEMBER 23, 2026
+Tool: OpenAI ChatGPT / Codex.
+User prompt (verbatim text with presentation formatting normalized):
+HW4 completes the AirAsia Rewards Redemption System by adding secure access,
+role based permissions, customer creation, customer account information,
+and gift card redemption.
+Continue working from your cschlawin/IS6465-codyschlawin Air-Asia repository
+folder. The existing Gift Card CRUD pages should remain functional. Extend
+the application so that users must log in before accessing the system and
+so that the application enforces different permissions for Admin and
+Customer users.
+The AirAsia Requirements Document is the authoritative source for table
+names, column names, relationships, roles, and business rules. Follow the
+requirements document if it conflicts with a general example in this
+assignment.
+Read HW4_Air_Asia_Instructions.docx
+Read IS6465_Week9 Web Frameworks and MVC.pdf
+Read IS6465_Week9_Reading_Handout_v1.1[18Nov2026].pdf
+Read Lab1 through Lab7 within the cschlawin/IS6465-codyschlawin GitHub
+repository.
+Notes: All updates are to the copied version of Air Asia Website within
+cschlawin/IS6465-codyschlawin. Ensure code for Air Asia matches similar
+format and style within Lab1 through Lab7. Do not replace any aspect with
+Laravel.
+
+AI support: Read the supplied instructions, original requirements and both
+Week 9 sources; retrieved the Labs 1-7 text files and examined page,
+service, repository, auth/CSRF, SQL, test and shared-view patterns. Inspected
+the current copied Air Asia files/database before editing. Extended that
+application in place using procedural PHP functions, PDO prepared SQL,
+shared views, role/session/CSRF helpers, customer/account creation and
+transactional redemption. No Lab 1-7 source, original Air Asia repository,
+Laravel or duplicate application was introduced. Updated the course
+Codespaces PHP VARIANT setting because it still selected PHP 7.
+
+Suggestions tested, revised or rejected:
+- Rejected the generic Customer-only redemption restriction because the
+  authoritative original use case 8 allows Customer and Admin. Implemented
+  and tested own-account redemption for both; documented this decision.
+- Used a one-time ACCOUNT migration rather than discarding useful HW3
+  data. Ran setup twice and compared all original card/account values.
+- Tested rollback by forcing a REDEMPTION insert error after the deduction:
+  both balance and redemption count remained unchanged. Also tested rollback
+  of customer creation when its ACCOUNT insert fails.
+- Retained the original password attribute instead of inventing a
+  password_hash column from the tutoring lab. Stored generated hashes and
+  verified the two required grading passwords, including acrobat (7 chars).
+
+Verification: PHP 8.4.27 CLI/CGI with PDO SQLite. All 30 PHP files passed
+syntax checks; validation harness 29/29 PASS; in-memory integration harness
+22/22 PASS. Isolated CGI/session tests passed required logins, safe failures,
+session-ID rotation, old-ID rejection, anonymous redirects for 12 protected
+endpoints, direct role denial, own-profile/receipt/account scope, customer
+creation and hashed passwords, existing CRUD regression, CSRF, successful
+and insufficient redemptions, replay rejection, logout and private-file
+blocking. The committed database preserves 21 cards/five accounts and adds
+five hashed users, with no test redemptions or test-created customers.
+
+Limitations: A new HW4 Codespaces/container build or browser visual test
+has not been completed by the assistant. The CGI tests are actual PHP
+requests/responses and SQLite operations, not screenshots. Historical HW3
+student browser confirmations are preserved as history only. The student
+must review/understand the changes, run the HW4 manual checklist and record
+actual results before submission. No Canvas submission or instructor
+approval is claimed. GitHub publication is verified separately after push.

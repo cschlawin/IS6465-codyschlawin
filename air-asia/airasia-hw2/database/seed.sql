@@ -1,7 +1,18 @@
+-- Coursework fixtures only. Password values below are PHP-generated hashes.
+-- Grading login: bsmith / mysecret (Admin), pjones / acrobat (Customer).
+-- Existing IDs/rows are preserved; setup does not reset balances or cards.
+-- Existing HW3 account userIds 1-5 now link to these USER records.
+INSERT INTO USER (userId, userName, password, firstName, lastName, role) VALUES
+  (1, 'bsmith', '$2y$12$AOi7vil9RTlsxZfwXasOTeCw/dndR6uqNWPsvzZO/Z2SVa3nnKW5u', 'Bill', 'Smith', 'Admin'),
+  (2, 'pjones', '$2y$12$qAmE0Ai6x75iDg/xwbT3oughGUDalZXfwh8S3CQWyWOUA1foUrq7e', 'Pat', 'Jones', 'Customer'),
+  (3, 'sample3', '$2y$12$C0ivQb8UKdJjpfZAAyaINO8gRt06q8QvwqiOR3ci2rdH9Gh9Axswa', 'Casey', 'Taylor', 'Customer'),
+  (4, 'sample4', '$2y$12$SBGQPKpyXkENfmWUvtugP.qruu.zjzY7uEb7mXAizumIeqLB8Zsp2', 'Jordan', 'Lee', 'Customer'),
+  (5, 'sample5', '$2y$12$BRz5HkXOWO.DaixGYzjg.OLpgodYDtDUmh4NqqMMxv/X.37CHQkg6', 'Alex', 'Morgan', 'Customer')
+ON CONFLICT(userId) DO NOTHING;
+
 -- Fictional coursework data, not official prices or rewards offers.
 -- Fixed seed IDs make routine reruns nonduplicating and preserve existing rows.
 -- A deleted seed record is reintroduced only if seed.sql is deliberately rerun.
-BEGIN;
 INSERT INTO ACCOUNT (accountId, userId, accountType, points) VALUES
   (1, 1, 'Rewards', 12000),
   (2, 2, 'Rewards', 18000),
@@ -33,4 +44,3 @@ INSERT INTO GIFTCARD (cardId, cardName, cardType, cardValue, points) VALUES
   (19, 'Xbox Gift Card', 'Entertainment', 25.00, 2500),
   (20, 'Hotels.com Gift Card', 'Travel', 50.00, 5000)
 ON CONFLICT(cardId) DO NOTHING;
-COMMIT;

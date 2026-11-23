@@ -79,13 +79,48 @@ function error_attributes(array $errors, string $field): string
 function show_error(string $message, int $status = 400): void
 {
   http_response_code($status);
-  $pageTitle = 'Unable to Open Gift Card';
+  $pageTitle = 'Unable to Complete Request';
+  $user = $GLOBALS['user'] ?? null;
+  $basePath = str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/tests/')
+    ? '../' : '';
   require_once __DIR__ . '/header.php';
   require_once __DIR__ . '/nav.php';
-  echo '<section class="panel form-panel"><h1>Unable to Open Gift Card</h1>';
+  echo '<section class="panel form-panel"><h1>Unable to Complete Request</h1>';
   echo '<p role="alert">' . e($message) . '</p>';
-  echo '<a class="button" href="card-list.php">Return to Gift Card List</a>';
+  $returnUrl = function_exists('appUrl') ? appUrl('card-list.php')
+    : 'card-list.php';
+  echo '<a class="button" href="' . e($returnUrl)
+    . '">Return to Gift Card List</a>';
   echo '</section>';
   require_once __DIR__ . '/footer.php';
   exit;
+}
+
+
+function nonnegative_integer($value): ?int
+{
+  return $value === '0' || $value === 0 ? 0 : positive_integer($value);
+}
+
+function validateCustomer(array $input): array
+{
+  $values = [];
+  $errors = [];
+  foreach (['userName', 'firstName', 'lastName', 'accountType'] as $field) {
+    $values[$field] = text_value($input[$field] ?? null);
+    if ($values[$field] === '' || character_count($values[$field]) > 100) {
+      $errors[$field] = 'Enter 1 to 100 characters.';
+    }
+  }
+  $values['points'] = text_value($input['points'] ?? null);
+  if (nonnegative_integer($values['points']) === null) {
+    $errors['points'] = 'Enter zero or a positive whole number of points.';
+  }
+  $password = $input['password'] ?? null;
+  if (!is_string($password) || strlen($password) < 8
+      || strlen($password) > 72 || str_contains($password, "\0")) {
+    $errors['password'] = 'Use a password of 8 to 72 bytes.';
+  }
+  // Passwords are never returned as form values or put into the session.
+  return ['values' => $values, 'errors' => $errors];
 }
